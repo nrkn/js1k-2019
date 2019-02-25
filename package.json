@@ -1,0 +1,25 @@
+{
+  "name": "js1k-2019",
+  "version": "0.0.1",
+  "description": "JS1K 2019 Entry",
+  "main": "./dist/index.js",
+  "scripts": {
+    "build": "tsc && node ./dist/build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nrkn/js1k-2019.git"
+  },
+  "keywords": [],
+  "author": "Nik Coughlin <nrkn.com@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/nrkn/js1k-2019/issues"
+  },
+  "homepage": "https://github.com/nrkn/js1k-2019#readme",
+  "devDependencies": {
+    "@types/jsdom": "^12.2.2",
+    "@types/node": "^11.9.5",
+    "jsdom": "^13.2.0"
+  }
+}
