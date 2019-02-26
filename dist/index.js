@@ -37,25 +37,15 @@ let s = () => {
         let roomMin = 4;
         let roomMax = 12;
         let junctions = [[0, 0]];
-        for (let i = 1; i < junctionCount; i++) {
+        while (junctionCount--) {
             let dir = ~~(Math.random() * 4);
             let length = ~~(Math.random() * roomMax * 2) + roomMin * 2;
             let current = junctions[~~(Math.random() * junctions.length)];
             mapData[key(current[0], current[1])] = floor;
             for (let c = 0; c < length; c++) {
                 current = [
-                    current[0] + [
-                        [0, -1],
-                        [-1, 0],
-                        [1, 0],
-                        [0, 1]
-                    ][dir][0],
-                    current[1] + [
-                        [0, -1],
-                        [-1, 0],
-                        [1, 0],
-                        [0, 1]
-                    ][dir][1]
+                    current[0] + [0, -1, 1, 0][dir],
+                    current[1] + [-1, 0, 0, 1][dir]
                 ];
                 mapData[key(current[0], current[1])] = floor;
             }
