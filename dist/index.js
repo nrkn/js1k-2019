@@ -19,6 +19,8 @@ let s = () => {
     let widthsData = {};
     let heightsData = {};
     let mapData = {};
+    let monsterData = {};
+    let monsterChance = 10;
     let roomCount = 0;
     let current = [rooms, rooms];
     let player;
@@ -29,7 +31,9 @@ let s = () => {
             for (let viewX = 0; viewX < VIEWSIZE; viewX++) {
                 let mapX = viewX - 4 + player[0];
                 let mapY = viewY - 4 + player[1];
-                let spriteIndex = viewX === 4 && viewY === 4 ? 0 : -1;
+                let spriteIndex = (viewX === 4 && viewY === 4 ? 0 :
+                    monsterData[key(mapX, mapY)] ? 1 :
+                        -1);
                 let drawX = viewX * 7 * TILESIZE;
                 let drawY = viewY * 7 * TILESIZE;
                 for (let spriteY = 0; spriteY < 7; spriteY++) {
@@ -103,6 +107,19 @@ let s = () => {
                 if (graphData[key(x, y)]) {
                     let centerX = ~~(widthsData[x] / 2);
                     let centerY = ~~(heightsData[y] / 2);
+                    let xOff = centerX - ~~(graphData[key(x, y)][width] / 2);
+                    let yOff = centerY - ~~(graphData[key(x, y)][height] / 2);
+                    for (let ry = 0; ry < graphData[key(x, y)][height]; ry++) {
+                        for (let rx = 0; rx < graphData[key(x, y)][width]; rx++) {
+                            mapData[key(rx + xOff + mapX, ry + yOff + mapY)] = floor;
+                            if (x === rooms && y === rooms) {
+                                player = [centerX + mapX, centerY + mapY];
+                            }
+                            else if (~~(Math.random() * monsterChance) === 0) {
+                                monsterData[key(rx + xOff + mapX, ry + yOff + mapY)] = 1;
+                            }
+                        }
+                    }
                     for (let gy = 0; gy < heightsData[y]; gy++) {
                         for (let gx = 0; gx < widthsData[x]; gx++) {
                             // draw if up
@@ -138,34 +155,50 @@ let s = () => {
             if (heightsData[y])
                 mapY += heightsData[y];
         }
-        //draw rooms
-        mapY = 0;
-        for (let y = 0; y < rooms * 2; y++) {
-            mapX = 0;
-            for (let x = 0; x < rooms * 2; x++) {
-                if (graphData[key(x, y)]) {
-                    let centerX = ~~(widthsData[x] / 2);
-                    let centerY = ~~(heightsData[y] / 2);
-                    let xOff = centerX - ~~(graphData[key(x, y)][width] / 2);
-                    let yOff = centerY - ~~(graphData[key(x, y)][height] / 2);
-                    for (let ry = 0; ry < graphData[key(x, y)][height]; ry++) {
-                        for (let rx = 0; rx < graphData[key(x, y)][width]; rx++) {
-                            mapData[key(rx + xOff + mapX, ry + yOff + mapY)] = floor;
-                        }
-                    }
-                    if (x === rooms && y === rooms) {
-                        player = [centerX + mapX, centerY + mapY];
-                    }
-                }
-                if (widthsData[x])
-                    mapX += widthsData[x];
-            }
-            if (heightsData[y])
-                mapY += heightsData[y];
-        }
     };
     createMap();
     draw();
+    b.onkeydown = e => {
+        let y = (e.which === 38 ? -1 :
+            e.which === 40 ? 1 :
+                0);
+        let x = (e.which === 37 ? -1 :
+            e.which === 39 ? 1 :
+                0);
+        if (mapData[key(player[0] + x, player[1] + y)] === floor) {
+            player = [player[0] + x, player[1] + y];
+        }
+        // for( y = 0; y < rooms * ( sizeMax + sizeMin ) * 2; y++ ){
+        //   for ( x = 0; x < rooms * ( sizeMax + sizeMin ) * 2; x++ ){
+        //     if( monsterData[ key( x, y ) ] ){
+        //       let current = [ x, y ]
+        //       let dir = ~~( Math.random() * 4 )
+        //       current = [
+        //         current[ 0 ] + [
+        //           [ 0, -1 ],
+        //           [ -1, 0 ],
+        //           [ 1, 0 ],
+        //           [ 0, 1 ]
+        //         ][ dir ][ 0 ],
+        //         current[ 1 ] + [
+        //           [ 0, -1 ],
+        //           [ -1, 0 ],
+        //           [ 1, 0 ],
+        //           [ 0, 1 ]
+        //         ][ dir ][ 1 ]
+        //       ]
+        //       if( current[ 0 ] === player[ 0 ] && current[ 1 ] === player[ 1 ] ){
+        //       } else if ( mapData[ key( current[ 0 ], current[ 1 ] ) ] === floor ) {
+        //         if( !monsterData[ key( current[ 0 ], current[ 1 ] ) ] ){
+        //           monsterData[ key( x, y ) ] = 0
+        //           monsterData[ key( current[ 0 ], current[ 1 ] ) ] = 1
+        //         }
+        //       }
+        //     }
+        //   }
+        // }
+        draw();
+    };
 };
 s();
 //# sourceMappingURL=index.js.map
