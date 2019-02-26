@@ -129,102 +129,260 @@
       var TOKEN_RELOAD_ONORIENTATIONCHANGE = true;
     </script>
     <script type="demo">"use strict";
-const init = () => {
-    const sprites = 'A~j~A`M___Wu_____Gkc_  $  0 __O__[__Cm}yCW_WWKK}j_Al~vv`_A``hh`_Cauau___QTfv`_C}u}C}__Xbt__';
-    const xor = 32;
-    const VIEWSIZE = 9;
-    const TILESIZE = 5;
-    const paper = [
-        // SPRITE_PLAYER
-        5,
-        // SPRITE_GRASS
-        5,
-        // SPRITE_ROCK
-        5,
-        // SPRITE_WATER
-        10,
-        // SPRITE_SAND
-        2,
-        // SPRITE_TREE
-        5,
-        // SPRITE_MOUNTAIN
-        5,
-        // SPRITE_HUT
-        5,
-        // SPRITE_HUT_LOCKED
-        5,
-        // SPRITE_GHOST
-        5,
-        // SPRITE_RUIN
-        5,
-        // SPRITE_PORTAL
-        5,
-        // SPRITE_KEY
-        5
-    ];
-    const ink = [
-        // SPRITE_PLAYER
-        0,
-        // SPRITE_GRASS
-        1,
-        // SPRITE_ROCK
-        2,
-        // SPRITE_WATER
-        3,
-        // SPRITE_SAND
-        4,
-        // SPRITE_TREE
-        6,
-        // SPRITE_MOUNTAIN
-        7,
-        // SPRITE_HUT
-        8,
-        // SPRITE_HUT_LOCKED
-        9,
-        // SPRITE_GHOST
-        10,
-        // SPRITE_RUIN
-        11,
-        // SPRITE_PORTAL
-        12,
-        // SPRITE_KEY
-        13
-    ];
-    let playerX = 0;
-    let playerY = 0;
-    let hour = 17;
-    let mins = 0;
-    const map = {};
-    const color = (value) => 'hsl(' + (value * 23) + ',100%,50%)';
-    const getKey = (x, y) => x + ',' + y;
-    const randInt = (exclMax) => ~~(Math.random() * exclMax);
-    const getMap = (x, y) => map[getKey(x, y)] || (map[getKey(x, y)] = randInt(6) + 1);
-    const draw = () => {
+let s = () => {
+    let sprites = '_`t`_~SA]kkA';
+    let xor = 65;
+    let VIEWSIZE = 9;
+    let TILESIZE = 5;
+    let floor = 2;
+    let wall = 3;
+    let up = 0;
+    let left = 1;
+    let right = 2;
+    let down = 3;
+    let width = 4;
+    let height = 5;
+    let key = (x, y) => x + ',' + y;
+    let rooms = 40;
+    let sizeMin = 4;
+    let sizeMax = 12;
+    let roomChance = 4;
+    let graphData = {};
+    let widthsData = {};
+    let heightsData = {};
+    let mapData = {};
+    let roomCount = 0;
+    let current = [rooms, rooms];
+    let player;
+    let draw = () => {
         a.width = a.height = VIEWSIZE * 7 * TILESIZE;
+        c.fillStyle = '#000';
         for (let viewY = 0; viewY < VIEWSIZE; viewY++) {
             for (let viewX = 0; viewX < VIEWSIZE; viewX++) {
-                const mapX = viewX - 4 + playerX;
-                const mapY = viewY - 4 + playerY;
-                const spriteIndex = getMap(mapX, mapY);
-                const drawX = viewX * 7 * TILESIZE;
-                const drawY = viewY * 7 * TILESIZE;
+                let mapX = viewX - 4 + player[0];
+                let mapY = viewY - 4 + player[1];
+                let spriteIndex = viewX === 4 && viewY === 4 ? 0 : -1;
+                let drawX = viewX * 7 * TILESIZE;
+                let drawY = viewY * 7 * TILESIZE;
                 for (let spriteY = 0; spriteY < 7; spriteY++) {
                     for (let spriteX = 0; spriteX < 7; spriteX++) {
-                        if ((xor ^ sprites.charCodeAt(spriteIndex * 7 + spriteY)) >> spriteX & 1) {
-                            c.fillStyle = color(paper[spriteIndex]);
+                        if (spriteIndex >= 0 && (xor ^ sprites.charCodeAt(spriteIndex * 7 + spriteY)) >> spriteX & 1) {
+                            c.fillRect(spriteX * TILESIZE + drawX, spriteY * TILESIZE + drawY, TILESIZE, TILESIZE);
                         }
-                        else {
-                            c.fillStyle = color(ink[spriteIndex]);
+                        else if (!mapData[key(mapX, mapY)]) {
+                            c.fillRect(spriteX * TILESIZE + drawX, spriteY * TILESIZE + drawY, TILESIZE, TILESIZE);
                         }
-                        c.fillRect(spriteX * TILESIZE + drawX, spriteY * TILESIZE + drawY, TILESIZE, TILESIZE);
                     }
                 }
             }
         }
     };
+    while (roomCount < rooms) {
+        let dir = ~~(Math.random() * 4);
+        if (!widthsData[current[0]]) {
+            widthsData[current[0]] = ~~(Math.random() * sizeMax) + sizeMin;
+        }
+        if (!heightsData[current[1]]) {
+            heightsData[current[1]] = ~~(Math.random() * sizeMax) + sizeMin;
+        }
+        if (!graphData[key(current[0], current[1])]) {
+            graphData[key(current[0], current[1])] = [
+                0, 0, 0, 0,
+                ~~(Math.random() * widthsData[current[0]]) + 1,
+                ~~(Math.random() * heightsData[current[1]]) + 1
+                // ~~( Math.random() * roomChance ) ? ~~( Math.random() * widthsData[ current[ 0 ] ] ) + 1 : 1,
+                // ~~( Math.random() * roomChance ) ? ~~( Math.random() * heightsData[ current[ 1 ] ] ) + 1 : 1
+            ];
+            roomCount++;
+        }
+        graphData[key(current[0], current[1])][dir] = 1;
+        current = [
+            current[0] + [
+                [0, -1],
+                [-1, 0],
+                [1, 0],
+                [0, 1]
+            ][dir][0],
+            current[1] + [
+                [0, -1],
+                [-1, 0],
+                [1, 0],
+                [0, 1]
+            ][dir][1]
+        ];
+        if (!widthsData[current[0]]) {
+            widthsData[current[0]] = ~~(Math.random() * sizeMax) + sizeMin;
+        }
+        if (!heightsData[current[1]]) {
+            heightsData[current[1]] = ~~(Math.random() * sizeMax) + sizeMin;
+        }
+        if (!graphData[key(current[0], current[1])]) {
+            graphData[key(current[0], current[1])] = [
+                0, 0, 0, 0,
+                ~~(Math.random() * widthsData[current[0]]) + 1,
+                ~~(Math.random() * heightsData[current[1]]) + 1
+            ];
+            roomCount++;
+        }
+        // ( 3 - dir ) is the opposite direction to dir
+        graphData[key(current[0], current[1])][3 - dir] = 1;
+    }
+    let createMap = () => {
+        let mapX, mapY;
+        // // draw corridor walls
+        // mapY = 0
+        // for ( let y = 0; y < rooms * 2; y++ ) {
+        //   mapX = 0
+        //   for ( let x = 0; x < rooms * 2; x++ ) {
+        //     if ( graphData[ key( x, y ) ] ) {
+        //       let centerX = ~~( widthsData[ x ] / 2 )
+        //       let centerY = ~~( heightsData[ y ] / 2 )
+        //       for ( let gy = 0; gy < heightsData[ y ]; gy++ ) {
+        //         for ( let gx = 0; gx < widthsData[ x ]; gx++ ) {
+        //           // draw if up
+        //           if ( graphData[ key( x, y ) ][ up ] ) {
+        //             if ( gy <= centerY && gx === centerX ) {
+        //               for ( let wy = -1; wy < 2; wy++ ) {
+        //                 for ( let wx = -1; wx < 2; wx++ ) {
+        //                   mapData[ key( gx + mapX + wx, gy + mapY + wy ) ] = wall
+        //                 }
+        //               }
+        //             }
+        //           }
+        //           // draw if left
+        //           if ( graphData[ key( x, y ) ][ left ] ) {
+        //             if ( gx <= centerX && gy === centerY ) {
+        //               for ( let wy = -1; wy < 2; wy++ ) {
+        //                 for ( let wx = -1; wx < 2; wx++ ) {
+        //                   mapData[ key( gx + mapX + wx, gy + mapY + wy ) ] = wall
+        //                 }
+        //               }
+        //             }
+        //           }
+        //           // draw if right
+        //           if ( graphData[ key( x, y ) ][ right ] ) {
+        //             if ( gx >= centerX && gy === centerY ) {
+        //               for ( let wy = -1; wy < 2; wy++ ) {
+        //                 for ( let wx = -1; wx < 2; wx++ ) {
+        //                   mapData[ key( gx + mapX + wx, gy + mapY + wy ) ] = wall
+        //                 }
+        //               }
+        //             }
+        //           }
+        //           // draw if down
+        //           if ( graphData[ key( x, y ) ][ down ] ) {
+        //             if ( gy >= centerY && gx === centerX ) {
+        //               for ( let wy = -1; wy < 2; wy++ ) {
+        //                 for ( let wx = -1; wx < 2; wx++ ) {
+        //                   mapData[ key( gx + mapX + wx, gy + mapY + wy ) ] = wall
+        //                 }
+        //               }
+        //             }
+        //           }
+        //         }
+        //       }
+        //     }
+        //     if ( widthsData[ x ] ) mapX += widthsData[ x ]
+        //   }
+        //   if ( heightsData[ y ] ) mapY += heightsData[ y ]
+        // }
+        // //draw room walls
+        // mapY = 0
+        // for ( let y = 0; y < rooms * 2; y++ ) {
+        //   mapX = 0
+        //   for ( let x = 0; x < rooms * 2; x++ ) {
+        //     if ( graphData[ key( x, y ) ] ) {
+        //       let centerX = ~~( widthsData[ x ] / 2 )
+        //       let centerY = ~~( heightsData[ y ] / 2 )
+        //       let xOff = centerX - ~~( graphData[ key( x, y ) ][ width ] / 2 )
+        //       let yOff = centerY - ~~( graphData[ key( x, y ) ][ height ] / 2 )
+        //       for ( let ry = 0; ry < graphData[ key( x, y ) ][ height ]; ry++ ) {
+        //         for ( let rx = 0; rx < graphData[ key( x, y ) ][ width ]; rx++ ) {
+        //           for ( let wy = -1; wy < 2; wy++ ) {
+        //             for ( let wx = -1; wx < 2; wx++ ) {
+        //               mapData[ key( rx + xOff + mapX + wx, ry + yOff + mapY + wy ) ] = wall
+        //             }
+        //           }
+        //         }
+        //       }
+        //     }
+        //     if ( widthsData[ x ] ) mapX += widthsData[ x ]
+        //   }
+        //   if ( heightsData[ y ] ) mapY += heightsData[ y ]
+        // }
+        // draw corridors
+        mapY = 0;
+        for (let y = 0; y < rooms * 2; y++) {
+            mapX = 0;
+            for (let x = 0; x < rooms * 2; x++) {
+                if (graphData[key(x, y)]) {
+                    let centerX = ~~(widthsData[x] / 2);
+                    let centerY = ~~(heightsData[y] / 2);
+                    for (let gy = 0; gy < heightsData[y]; gy++) {
+                        for (let gx = 0; gx < widthsData[x]; gx++) {
+                            // draw if up
+                            if (graphData[key(x, y)][up]) {
+                                if (gy <= centerY && gx === centerX) {
+                                    mapData[key(gx + mapX, gy + mapY)] = floor;
+                                }
+                            }
+                            // draw if left
+                            if (graphData[key(x, y)][left]) {
+                                if (gx <= centerX && gy === centerY) {
+                                    mapData[key(gx + mapX, gy + mapY)] = floor;
+                                }
+                            }
+                            // draw if right
+                            if (graphData[key(x, y)][right]) {
+                                if (gx >= centerX && gy === centerY) {
+                                    mapData[key(gx + mapX, gy + mapY)] = floor;
+                                }
+                            }
+                            // draw if down
+                            if (graphData[key(x, y)][down]) {
+                                if (gy >= centerY && gx === centerX) {
+                                    mapData[key(gx + mapX, gy + mapY)] = floor;
+                                }
+                            }
+                        }
+                    }
+                }
+                if (widthsData[x])
+                    mapX += widthsData[x];
+            }
+            if (heightsData[y])
+                mapY += heightsData[y];
+        }
+        //draw rooms
+        mapY = 0;
+        for (let y = 0; y < rooms * 2; y++) {
+            mapX = 0;
+            for (let x = 0; x < rooms * 2; x++) {
+                if (graphData[key(x, y)]) {
+                    let centerX = ~~(widthsData[x] / 2);
+                    let centerY = ~~(heightsData[y] / 2);
+                    let xOff = centerX - ~~(graphData[key(x, y)][width] / 2);
+                    let yOff = centerY - ~~(graphData[key(x, y)][height] / 2);
+                    for (let ry = 0; ry < graphData[key(x, y)][height]; ry++) {
+                        for (let rx = 0; rx < graphData[key(x, y)][width]; rx++) {
+                            mapData[key(rx + xOff + mapX, ry + yOff + mapY)] = floor;
+                        }
+                    }
+                    if (x === rooms && y === rooms) {
+                        player = [centerX + mapX, centerY + mapY];
+                    }
+                }
+                if (widthsData[x])
+                    mapX += widthsData[x];
+            }
+            if (heightsData[y])
+                mapY += heightsData[y];
+        }
+    };
+    createMap();
     draw();
 };
-init();
+s();
 //# sourceMappingURL=index.js.map</script>
     <script>
       (function(){var doc=document;var header=doc.getElementsByTagName("header")[0];var firstChild=header.firstChild;var p=doc.getElementsByClassName("p")[0];
