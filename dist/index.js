@@ -5,7 +5,6 @@ let s = () => {
     let VIEWSIZE = 9;
     let TILESIZE = 5;
     let floor = 2;
-    let wall = 3;
     let up = 0;
     let left = 1;
     let right = 2;
@@ -16,7 +15,6 @@ let s = () => {
     let rooms = 40;
     let sizeMin = 4;
     let sizeMax = 12;
-    let roomChance = 4;
     let graphData = {};
     let widthsData = {};
     let heightsData = {};
@@ -60,8 +58,6 @@ let s = () => {
                 0, 0, 0, 0,
                 ~~(Math.random() * widthsData[current[0]]) + 1,
                 ~~(Math.random() * heightsData[current[1]]) + 1
-                // ~~( Math.random() * roomChance ) ? ~~( Math.random() * widthsData[ current[ 0 ] ] ) + 1 : 1,
-                // ~~( Math.random() * roomChance ) ? ~~( Math.random() * heightsData[ current[ 1 ] ] ) + 1 : 1
             ];
             roomCount++;
         }
@@ -99,87 +95,6 @@ let s = () => {
     }
     let createMap = () => {
         let mapX, mapY;
-        // // draw corridor walls
-        // mapY = 0
-        // for ( let y = 0; y < rooms * 2; y++ ) {
-        //   mapX = 0
-        //   for ( let x = 0; x < rooms * 2; x++ ) {
-        //     if ( graphData[ key( x, y ) ] ) {
-        //       let centerX = ~~( widthsData[ x ] / 2 )
-        //       let centerY = ~~( heightsData[ y ] / 2 )
-        //       for ( let gy = 0; gy < heightsData[ y ]; gy++ ) {
-        //         for ( let gx = 0; gx < widthsData[ x ]; gx++ ) {
-        //           // draw if up
-        //           if ( graphData[ key( x, y ) ][ up ] ) {
-        //             if ( gy <= centerY && gx === centerX ) {
-        //               for ( let wy = -1; wy < 2; wy++ ) {
-        //                 for ( let wx = -1; wx < 2; wx++ ) {
-        //                   mapData[ key( gx + mapX + wx, gy + mapY + wy ) ] = wall
-        //                 }
-        //               }
-        //             }
-        //           }
-        //           // draw if left
-        //           if ( graphData[ key( x, y ) ][ left ] ) {
-        //             if ( gx <= centerX && gy === centerY ) {
-        //               for ( let wy = -1; wy < 2; wy++ ) {
-        //                 for ( let wx = -1; wx < 2; wx++ ) {
-        //                   mapData[ key( gx + mapX + wx, gy + mapY + wy ) ] = wall
-        //                 }
-        //               }
-        //             }
-        //           }
-        //           // draw if right
-        //           if ( graphData[ key( x, y ) ][ right ] ) {
-        //             if ( gx >= centerX && gy === centerY ) {
-        //               for ( let wy = -1; wy < 2; wy++ ) {
-        //                 for ( let wx = -1; wx < 2; wx++ ) {
-        //                   mapData[ key( gx + mapX + wx, gy + mapY + wy ) ] = wall
-        //                 }
-        //               }
-        //             }
-        //           }
-        //           // draw if down
-        //           if ( graphData[ key( x, y ) ][ down ] ) {
-        //             if ( gy >= centerY && gx === centerX ) {
-        //               for ( let wy = -1; wy < 2; wy++ ) {
-        //                 for ( let wx = -1; wx < 2; wx++ ) {
-        //                   mapData[ key( gx + mapX + wx, gy + mapY + wy ) ] = wall
-        //                 }
-        //               }
-        //             }
-        //           }
-        //         }
-        //       }
-        //     }
-        //     if ( widthsData[ x ] ) mapX += widthsData[ x ]
-        //   }
-        //   if ( heightsData[ y ] ) mapY += heightsData[ y ]
-        // }
-        // //draw room walls
-        // mapY = 0
-        // for ( let y = 0; y < rooms * 2; y++ ) {
-        //   mapX = 0
-        //   for ( let x = 0; x < rooms * 2; x++ ) {
-        //     if ( graphData[ key( x, y ) ] ) {
-        //       let centerX = ~~( widthsData[ x ] / 2 )
-        //       let centerY = ~~( heightsData[ y ] / 2 )
-        //       let xOff = centerX - ~~( graphData[ key( x, y ) ][ width ] / 2 )
-        //       let yOff = centerY - ~~( graphData[ key( x, y ) ][ height ] / 2 )
-        //       for ( let ry = 0; ry < graphData[ key( x, y ) ][ height ]; ry++ ) {
-        //         for ( let rx = 0; rx < graphData[ key( x, y ) ][ width ]; rx++ ) {
-        //           for ( let wy = -1; wy < 2; wy++ ) {
-        //             for ( let wx = -1; wx < 2; wx++ ) {
-        //               mapData[ key( rx + xOff + mapX + wx, ry + yOff + mapY + wy ) ] = wall
-        //             }
-        //           }
-        //         }
-        //       }
-        //     }
-        //     if ( widthsData[ x ] ) mapX += widthsData[ x ]
-        //   }
-        //   if ( heightsData[ y ] ) mapY += heightsData[ y ]
-        // }
         // draw corridors
         mapY = 0;
         for (let y = 0; y < rooms * 2; y++) {
