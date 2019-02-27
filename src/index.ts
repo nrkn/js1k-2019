@@ -15,26 +15,39 @@ let s = () => {
 
   let key = ( x, y ) => x + ',' + y
 
-  let mapData: any = {}
-  let player = [ 0, 0 ]
-  let monsters: number[][] = []
-  let monsterChance = 10
+  let monsterChance = 1000
+
+  let mapData: any
+  let player: number[]
+  let monsters: number[][]
 
   let draw = () => {
     a.width = a.height = VIEWSIZE * 7 * TILESIZE
-    c.fillStyle = '#000'
     for ( let viewY = 0; viewY < VIEWSIZE; viewY++ ) {
       for ( let viewX = 0; viewX < VIEWSIZE; viewX++ ) {
         let mapX = viewX - 4 + player[ 0 ]
         let mapY = viewY - 4 + player[ 1 ]
-        let spriteIndex = (
-          viewX === 4 && viewY === 4 ? 0 :
-          mapData[ key( mapX, mapY ) ] === floor ? floor :
-          mapData[ key( mapX, mapY ) ] === monster ? monster :
-          -1
-        )
+        let spriteIndex = -1
+        let color: string | number = 0
+
+        if( viewX === 4 && viewY === 4 ){
+          spriteIndex = 0
+          color = '0fb730'[ player[ 2 ] ]
+        } else if ( mapData[ key( mapX, mapY ) ] === floor ){
+          spriteIndex = floor
+        } else if ( mapData[ key( mapX, mapY ) ] === monster ){
+          spriteIndex = monster
+          for ( let i = 0; i < monsters.length; i++ ) {
+            if ( monsters[ i ][ 0 ] === mapX && monsters[ i ][ 1 ] === mapY ) {
+              color = '0fb730'[ monsters[ i ][ 2 ] ]
+            }
+          }
+        }
+
         let drawX = viewX * 7 * TILESIZE
         let drawY = viewY * 7 * TILESIZE
+
+        c.fillStyle = '#' + color + '00'
 
         for ( let spriteY = 0; spriteY < 7; spriteY++ ) {
           for ( let spriteX = 0; spriteX < 7; spriteX++ ) {
@@ -50,6 +63,44 @@ let s = () => {
   }
 
   let createMap = () => {
+    mapData = {}
+    player = [ 0, 0, 5 ]
+    monsters = []
+
+    let movement = 1000
+    let current = [ 0, 0 ]
+
+    for( let i = 0; i < movement; i++ ){
+      for( let wy = -1; wy < 2; wy++ ){
+        for( let wx = -1; wx < 2; wx++ ){
+          mapData[ key( current[ 0 ] + wx, current[ 1 ] + wy ) ] = floor + ~~( Math.random() * 2 )
+
+          if (
+            ( current[ 0 ] + wx ) !== player[ 0 ] &&
+            !~~( Math.random() * monsterChance )
+          ) {
+            monsters[ monsters.length ] = [
+              current[ 0 ] + wx,
+              current[ 1 ] + wy,
+              ~~( Math.random() * 5 ) + 1
+            ]
+            mapData[ key(
+              current[ 0 ] + wx,
+              current[ 1 ] + wy
+            ) ] = monster
+          }
+        }
+      }
+
+      let dir = ~~( Math.random() * 4 )
+
+      current = [
+        current[ 0 ] + [ 0, -1, 1, 0 ][ dir ],
+        current[ 1 ] + [ -1, 0, 0, 1 ][ dir ]
+      ]
+    }
+
+    /*
     let roomCount = 20
     let junctionCount = 40
     let roomMin = 4
@@ -95,7 +146,8 @@ let s = () => {
           ){
             monsters[ monsters.length ] = [
               x + current[ 0 ] - ~~( width / 2 ),
-              y + current[ 1 ] - ~~( height / 2 )
+              y + current[ 1 ] - ~~( height / 2 ),
+              5
             ]
             mapData[ key(
               x + current[ 0 ] - ~~( width / 2 ),
@@ -105,6 +157,7 @@ let s = () => {
         }
       }
     }
+    */
   }
 
   createMap()
@@ -126,24 +179,56 @@ let s = () => {
       mapData[ key( player[ 0 ] + x, player[ 1 ] + y ) ] === floor ||
       mapData[ key( player[ 0 ] + x, player[ 1 ] + y ) ] === floor + 1
     ){
-      player = [ player[ 0 ] + x, player[ 1 ] + y ]
+      player = [ player[ 0 ] + x, player[ 1 ] + y, player[ 2 ] ]
+    } else if(
+      mapData[ key( player[ 0 ] + x, player[ 1 ] + y ) ] === monster
+    ){
+      for ( let i = 0; i < monsters.length; i++ ) {
+        if (
+          monsters[ i ][ 0 ] === ( player[ 0 ] + x ) &&
+          monsters[ i ][ 1 ] === ( player[ 1 ] + y )
+        ){
+          if( monsters[ i ][ 2 ] ){
+            monsters[ i ][ 2 ]--
+
+            if ( !monsters[ i ][ 2 ] ) {
+              mapData[ key( player[ 0 ] + x, player[ 1 ] + y ) ] = floor + ~~( Math.random() * 2 )
+            }
+          }
+        }
+      }
     }
 
     for( let i = 0; i < monsters.length; i++ ){
-      if( x || y ){
+      if ( ( x || y ) && monsters[ i ][ 2 ] ){
+        let action = ~~( Math.random() * 4 )
         let dir = ~~( Math.random() * 4 )
 
-        let x = [ 0, -1, 1, 0 ][ dir ]
-        let y = [ -1, 0, 0, 1 ][ dir ]
+        if( action < 2 ){
+          x = [ 0, -1, 1, 0 ][ dir ]
+          y = [ -1, 0, 0, 1 ][ dir ]
+        } else if( action < 3 ){
+          x = player[ 0 ] < monsters[ i ][ 0 ] ? -1 : 1
+          y = 0
+        } else {
+          x = 0
+          y = player[ 1 ] < monsters[ i ][ 1 ] ? -1 : 1
+        }
 
-        if ( x === player[ 0 ] && y === player[ 1 ] ) {
-          // bumped player
+        if ( monsters[ i ][ 0 ] + x === player[ 0 ] && monsters[ i ][ 1 ] + y === player[ 1 ] ) {
+          if( ~~( Math.random() * 2 ) ){
+            player[ 2 ]--
+
+            if ( !player[ 2 ] ) {
+              createMap()
+            }
+          }
         } else if (
           mapData[ key( monsters[ i ][ 0 ] + x, monsters[ i ][ 1 ] + y ) ] === floor ||
           mapData[ key( monsters[ i ][ 0 ] + x, monsters[ i ][ 1 ] + y ) ] === floor + 1
         ) {
           mapData[ key( monsters[ i ][ 0 ], monsters[ i ][ 1 ] ) ] = floor + ~~( Math.random() * 2 )
-          monsters[ i ] = [ monsters[ i ][ 0 ] + x, monsters[ i ][ 1 ] + y ]
+          monsters[ i ] = [ monsters[ i ][ 0 ] + x, monsters[ i ][ 1 ] + y, monsters[ i ][ 2 ] ]
           mapData[ key( monsters[ i ][ 0 ], monsters[ i ][ 1 ] ) ] = monster
         }
       }
