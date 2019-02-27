@@ -184,26 +184,6 @@ let s = () => {
                 c.fillStyle = '#' + color;
                 for (let spriteY = 0; spriteY < 7; spriteY++) {
                     for (let spriteX = 0; spriteX < 7; spriteX++) {
-                        // if (
-                        //   spriteIndex > -1
-                        //   &&
-                        //   ( xor ^ sprites.charCodeAt( spriteIndex * 7 + spriteY ) ) >> spriteX & 1
-                        // ){
-                        //   c.fillRect(
-                        //     spriteX * TILESIZE + drawX, spriteY * TILESIZE + drawY,
-                        //     TILESIZE, TILESIZE
-                        //   )
-                        // } else if (
-                        //   !mapData[ key(
-                        //     mapX,
-                        //     mapY
-                        //   ) ]
-                        // ) {
-                        //   c.fillRect(
-                        //     spriteX * TILESIZE + drawX, spriteY * TILESIZE + drawY,
-                        //     TILESIZE, TILESIZE
-                        //   )
-                        // }
                         if ((spriteIndex > -1
                             &&
                                 (xor ^ sprites.charCodeAt(spriteIndex * 7 + spriteY)) >> spriteX & 1)
