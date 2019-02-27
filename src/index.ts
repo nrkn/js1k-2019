@@ -130,18 +130,22 @@ let s = () => {
     }
 
     for( let i = 0; i < monsters.length; i++ ){
-      let dir = ~~( Math.random() * 4 )
+      if( x || y ){
+        let dir = ~~( Math.random() * 4 )
 
-      let x = [ 0, -1, 1, 0 ][ dir ]
-      let y = [ -1, 0, 0, 1 ][ dir ]
+        let x = [ 0, -1, 1, 0 ][ dir ]
+        let y = [ -1, 0, 0, 1 ][ dir ]
 
-      if (
-        mapData[ key( monsters[ i ][ 0 ] + x, monsters[ i ][ 1 ] + y ) ] === floor ||
-        mapData[ key( monsters[ i ][ 0 ] + x, monsters[ i ][ 1 ] + y ) ] === floor + 1
-      ) {
-        mapData[ key( monsters[ i ][ 0 ], monsters[ i ][ 1 ] ) ] = floor + ~~( Math.random() * 2 )
-        monsters[ i ] = [ monsters[ i ][ 0 ] + x, monsters[ i ][ 1 ] + y ]
-        mapData[ key( monsters[ i ][ 0 ], monsters[ i ][ 1 ] ) ] = monster
+        if ( x === player[ 0 ] && y === player[ 1 ] ) {
+          // bumped player
+        } else if (
+          mapData[ key( monsters[ i ][ 0 ] + x, monsters[ i ][ 1 ] + y ) ] === floor ||
+          mapData[ key( monsters[ i ][ 0 ] + x, monsters[ i ][ 1 ] + y ) ] === floor + 1
+        ) {
+          mapData[ key( monsters[ i ][ 0 ], monsters[ i ][ 1 ] ) ] = floor + ~~( Math.random() * 2 )
+          monsters[ i ] = [ monsters[ i ][ 0 ] + x, monsters[ i ][ 1 ] + y ]
+          mapData[ key( monsters[ i ][ 0 ], monsters[ i ][ 1 ] ) ] = monster
+        }
       }
     }
 
