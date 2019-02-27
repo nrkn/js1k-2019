@@ -4,7 +4,7 @@ declare const c: CanvasRenderingContext2D
 declare const d: Document
 
 let s = () => {
-  let sprites = '_@T@_~SA]kkAo@@A@@A_MMS`~_~NRUTT~'
+  let sprites = '_@T@_~SA]kkA@@@@@A_MMS`~_~NRUTT~'
   let xor = 65
 
   let VIEWSIZE = 9
@@ -86,15 +86,12 @@ let s = () => {
         for ( let spriteY = 0; spriteY < 7; spriteY++ ) {
           for ( let spriteX = 0; spriteX < 7; spriteX++ ) {
             if (
-              spriteIndex > -1
-              &&
-              ( xor ^ sprites.charCodeAt( spriteIndex * 7 + spriteY ) ) >> spriteX & 1
-            ){
-              c.fillRect(
-                spriteX * TILESIZE + drawX, spriteY * TILESIZE + drawY,
-                TILESIZE, TILESIZE
+              (
+                spriteIndex > -1
+                &&
+                ( xor ^ sprites.charCodeAt( spriteIndex * 7 + spriteY ) ) >> spriteX & 1
               )
-            } else if (
+              ||
               !mapData[ key(
                 mapX,
                 mapY
