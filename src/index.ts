@@ -30,7 +30,6 @@ let s = () => {
     a.width = a.height = VIEWSIZE * 7 * TILESIZE
     for ( let viewY = 0; viewY < VIEWSIZE; viewY++ ) {
       for ( let viewX = 0; viewX < VIEWSIZE; viewX++ ) {
-        //let mapX = viewX - 4 + player[ 0 ]
         let mapY = viewY - 4 + player[ 1 ]
         let spriteIndex = -1
         let color: string | number = 37 + 'fd9640'[ level ]
@@ -111,13 +110,10 @@ let s = () => {
     player = [ 0, 0, 5 ]
     monsters = []
 
-    if( level == 6 ) return
-
-    //let movement = 640 * ( level + 1 )
-    //let monsterChance = movement / ( level + 7 )
     let current = [ 0, 0 ]
+    let size = 640
 
-    for ( let i = 0; i < ( 640 * ( level + 1 ) ); i++ ){
+    for ( let i = 0; i < ( size * ( level + 1 ) ); i++ ){
       mapData[ key(
         current[ 0 ],
         current[ 1 ]
@@ -125,7 +121,7 @@ let s = () => {
 
       if (
         ( current[ 0 ] ) !== player[ 0 ] &&
-        !~~( Math.random() * ( 640 * ( level + 1 ) ) / ( level + 7 ) )
+        !~~( Math.random() * ( size * ( level + 1 ) ) / ( level + 7 ) )
       ) {
         mapData[ key(
           current[ 0 ],
@@ -134,7 +130,7 @@ let s = () => {
       }
       else if (
         ( current[ 0 ] ) !== player[ 0 ] &&
-        !~~( Math.random() * ( 640 * ( level + 1 ) ) / ( level + 7 ) )
+        !~~( Math.random() * ( size * ( level + 1 ) ) / ( level + 7 ) )
       ) {
         monsters[ monsters.length ] = [
           current[ 0 ],
@@ -265,6 +261,7 @@ let s = () => {
       ) ] == stairs
     ){
       level++
+
       createMap()
     }
 
