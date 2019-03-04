@@ -4,16 +4,16 @@ declare const c: CanvasRenderingContext2D
 declare const d: Document
 
 let s = () => {
-  let sprites = '_@T@_~SA]kkA@@@@@A_MMS`~_~NRUTT~'
-  let xor = 65
+  let sprites = '^AUA^R@N_U_U@@@@@@U@^LLRa^OSTUU'
+  let xor = 64
 
   let VIEWSIZE = 9
   let TILESIZE = 5
 
-  let floor = 2
-  let floor2 = 3
-  let potion = 4
-  let stairs = 5
+  let floor = 3
+  let potion = 5
+  let stairs = 6
+  let playerSprite = 0
   let monsterSprite = 1
   let floorSprite = 2
   let potionSprite = 3
@@ -33,49 +33,49 @@ let s = () => {
         let mapX = viewX - 4 + player[ 0 ]
         let mapY = viewY - 4 + player[ 1 ]
         let spriteIndex = -1
-        let color: string | number = 37 + '0fb730'[ level ]
+        let color: string | number = 37 + 'fd9640'[ level ]
 
-        if( viewX === 4 && viewY === 4 ){
+        if( viewX == 4 && viewY == 4 ){
           spriteIndex = 0
-          color = '0fb730'[ player[ 2 ] ] + 37
+          color = 'fd9640'[ player[ 2 ] ] + 37
         }
         else if (
           mapData[ key(
             mapX,
             mapY
-          ) ] === floor
+          ) ] == floor
         ){
           spriteIndex = floorSprite
-          color = 'eee'
+          color = 'fd9'
         }
         else if (
           mapData[ key(
             mapX,
             mapY
-          ) ] === potion
+          ) ] == potion
         ) {
           spriteIndex = potionSprite
-          color = 909
+          color = 640
         }
         else if (
           mapData[ key(
             mapX,
             mapY
-          ) ] === stairs
+          ) ] == stairs
         ){
-          spriteIndex = stairsSprite
+          spriteIndex = level < 5 ? stairsSprite : playerSprite
         }
 
         for ( let i = 0; i < monsters.length; i++ ) {
           if (
             monsters[ i ][ 2 ]
             &&
-            monsters[ i ][ 0 ] === mapX
+            monsters[ i ][ 0 ] == mapX
             &&
-            monsters[ i ][ 1 ] === mapY
+            monsters[ i ][ 1 ] == mapY
           ) {
             spriteIndex = monsterSprite
-            color = '0fb730'[ monsters[ i ][ 2 ] ] + 37
+            color = 'fd9640'[ monsters[ i ][ 2 ] ] + 37
           }
         }
 
@@ -114,11 +114,13 @@ let s = () => {
     player = [ 0, 0, 5 ]
     monsters = []
 
-    let movement = 1000 * ( level + 1 )
-    let monsterChance = movement / 4
+    if( level == 6 ) return
+
+    //let movement = 640 * ( level + 1 )
+    //let monsterChance = movement / ( level + 7 )
     let current = [ 0, 0 ]
 
-    for( let i = 0; i < movement; i++ ){
+    for ( let i = 0; i < ( 640 * ( level + 1 ) ); i++ ){
       mapData[ key(
         current[ 0 ],
         current[ 1 ]
@@ -126,7 +128,7 @@ let s = () => {
 
       if (
         ( current[ 0 ] ) !== player[ 0 ] &&
-        !~~( Math.random() * monsterChance )
+        !~~( Math.random() * ( 640 * ( level + 1 ) ) / ( level + 7 ) )
       ) {
         mapData[ key(
           current[ 0 ],
@@ -135,7 +137,7 @@ let s = () => {
       }
       else if (
         ( current[ 0 ] ) !== player[ 0 ] &&
-        !~~( Math.random() * monsterChance )
+        !~~( Math.random() * ( 640 * ( level + 1 ) ) / ( level + 7 ) )
       ) {
         monsters[ monsters.length ] = [
           current[ 0 ],
@@ -163,13 +165,13 @@ let s = () => {
 
   b.onkeydown = e => {
     let x = (
-      e.which === 37 ? -1 :
-        e.which === 39 ? 1 :
+      e.which == 37 ? -1 :
+        e.which == 39 ? 1 :
           0
     )
     let y = (
-      e.which === 38 ? -1 :
-      e.which === 40 ? 1 :
+      e.which == 38 ? -1 :
+      e.which == 40 ? 1 :
       0
     )
 
@@ -179,8 +181,8 @@ let s = () => {
         let dir = ~~( Math.random() * 4 )
 
         if (
-          monsters[ i ][ 0 ] === ( player[ 0 ] + x ) &&
-          monsters[ i ][ 1 ] === ( player[ 1 ] + y )
+          monsters[ i ][ 0 ] == ( player[ 0 ] + x ) &&
+          monsters[ i ][ 1 ] == ( player[ 1 ] + y )
         ) {
           if ( monsters[ i ][ 2 ] ) {
             monsters[ i ][ 2 ]--
@@ -204,9 +206,9 @@ let s = () => {
           }
 
           if (
-            monsters[ i ][ 0 ] + mx === player[ 0 ]
+            monsters[ i ][ 0 ] + mx == player[ 0 ]
             &&
-            monsters[ i ][ 1 ] + my === player[ 1 ]
+            monsters[ i ][ 1 ] + my == player[ 1 ]
           ) {
             if ( ~~( Math.random() * 2 ) ) {
               player[ 2 ]--
@@ -217,15 +219,11 @@ let s = () => {
               }
             }
           } else if (
+            // floor is 3 or 4
             mapData[ key(
               monsters[ i ][ 0 ] + mx,
               monsters[ i ][ 1 ] + my
-            ) ] === floor
-            ||
-            mapData[ key(
-              monsters[ i ][ 0 ] + mx,
-              monsters[ i ][ 1 ] + my
-            ) ] === floor2
+            ) ] < 5
           ) {
             monsters[ i ] = [
               monsters[ i ][ 0 ] + mx,
@@ -241,12 +239,7 @@ let s = () => {
       mapData[ key(
         player[ 0 ] + x,
         player[ 1 ] + y
-      ) ] === floor
-      ||
-      mapData[ key(
-        player[ 0 ] + x,
-        player[ 1 ] + y )
-      ] === floor2
+      ) ] < 5
     ){
       player = [
         player[ 0 ] + x,
@@ -258,7 +251,7 @@ let s = () => {
       mapData[ key(
         player[ 0 ] + x,
         player[ 1 ] + y
-      ) ] === potion
+      ) ] == potion
     ) {
       mapData[ key(
         player[ 0 ] + x,
@@ -272,12 +265,11 @@ let s = () => {
       mapData[ key(
         player[ 0 ] + x,
         player[ 1 ] + y
-      ) ] === stairs
+      ) ] == stairs
     ){
       level++
       createMap()
     }
-
 
     draw()
   }
