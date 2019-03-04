@@ -112,7 +112,7 @@ let s = () => {
     monsters = []
 
     let current = [ 0, 0 ]
-    let size = 640
+    let size = 96
     //let size = 10
 
     for ( let i = 0; i < ( size * ( level + 1 ) ); i++ ){

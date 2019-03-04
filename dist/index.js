@@ -70,7 +70,7 @@ let s = () => {
         player = [0, 0, 5];
         monsters = [];
         let current = [0, 0];
-        let size = 640;
+        let size = 96;
         //let size = 10
         for (let i = 0; i < (size * (level + 1)); i++) {
             mapData[key(current[0], current[1])] = floor + ~~(Math.random() * 2);
