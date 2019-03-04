@@ -50,8 +50,8 @@ let s = () => {
                         color = 'fd9640'[monsters[i][2]] + 37;
                     }
                 }
-                let drawX = viewX * 7 * TILESIZE;
-                let drawY = viewY * 7 * TILESIZE;
+                //let drawX = viewX * 7 * TILESIZE
+                //let drawY = viewY * 7 * TILESIZE
                 c.fillStyle = '#' + color;
                 for (let spriteY = 0; spriteY < 7; spriteY++) {
                     for (let spriteX = 0; spriteX < 7; spriteX++) {
@@ -60,7 +60,7 @@ let s = () => {
                                 (xor ^ sprites.charCodeAt(spriteIndex * 7 + spriteY)) >> spriteX & 1)
                             ||
                                 !mapData[key(viewX - 4 + player[0], mapY)]) {
-                            c.fillRect(spriteX * TILESIZE + drawX, spriteY * TILESIZE + drawY, TILESIZE, TILESIZE);
+                            c.fillRect(spriteX * TILESIZE + viewX * 7 * TILESIZE, spriteY * TILESIZE + viewY * 7 * TILESIZE, TILESIZE, TILESIZE);
                         }
                     }
                 }

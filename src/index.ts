@@ -79,9 +79,6 @@ let s = () => {
           }
         }
 
-        let drawX = viewX * 7 * TILESIZE
-        let drawY = viewY * 7 * TILESIZE
-
         c.fillStyle = '#' + color
 
         for ( let spriteY = 0; spriteY < 7; spriteY++ ) {
@@ -99,7 +96,7 @@ let s = () => {
               ) ]
             ) {
               c.fillRect(
-                spriteX * TILESIZE + drawX, spriteY * TILESIZE + drawY,
+                spriteX * TILESIZE + viewX * 7 * TILESIZE, spriteY * TILESIZE + viewY * 7 * TILESIZE,
                 TILESIZE, TILESIZE
               )
             }
