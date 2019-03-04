@@ -30,7 +30,7 @@ let s = () => {
     a.width = a.height = VIEWSIZE * 7 * TILESIZE
     for ( let viewY = 0; viewY < VIEWSIZE; viewY++ ) {
       for ( let viewX = 0; viewX < VIEWSIZE; viewX++ ) {
-        let mapX = viewX - 4 + player[ 0 ]
+        //let mapX = viewX - 4 + player[ 0 ]
         let mapY = viewY - 4 + player[ 1 ]
         let spriteIndex = -1
         let color: string | number = 37 + 'fd9640'[ level ]
@@ -41,7 +41,7 @@ let s = () => {
         }
         else if (
           mapData[ key(
-            mapX,
+            viewX - 4 + player[ 0 ],
             mapY
           ) ] == floor
         ){
@@ -50,7 +50,7 @@ let s = () => {
         }
         else if (
           mapData[ key(
-            mapX,
+            viewX - 4 + player[ 0 ],
             mapY
           ) ] == potion
         ) {
@@ -59,7 +59,7 @@ let s = () => {
         }
         else if (
           mapData[ key(
-            mapX,
+            viewX - 4 + player[ 0 ],
             mapY
           ) ] == stairs
         ){
@@ -70,7 +70,7 @@ let s = () => {
           if (
             monsters[ i ][ 2 ]
             &&
-            monsters[ i ][ 0 ] == mapX
+            monsters[ i ][ 0 ] == viewX - 4 + player[ 0 ]
             &&
             monsters[ i ][ 1 ] == mapY
           ) {
@@ -94,7 +94,7 @@ let s = () => {
               )
               ||
               !mapData[ key(
-                mapX,
+                viewX - 4 + player[ 0 ],
                 mapY
               ) ]
             ) {

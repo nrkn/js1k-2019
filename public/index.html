@@ -151,7 +151,7 @@ let s = () => {
         a.width = a.height = VIEWSIZE * 7 * TILESIZE;
         for (let viewY = 0; viewY < VIEWSIZE; viewY++) {
             for (let viewX = 0; viewX < VIEWSIZE; viewX++) {
-                let mapX = viewX - 4 + player[0];
+                //let mapX = viewX - 4 + player[ 0 ]
                 let mapY = viewY - 4 + player[1];
                 let spriteIndex = -1;
                 let color = 37 + 'fd9640'[level];
@@ -159,21 +159,21 @@ let s = () => {
                     spriteIndex = 0;
                     color = 'fd9640'[player[2]] + 37;
                 }
-                else if (mapData[key(mapX, mapY)] == floor) {
+                else if (mapData[key(viewX - 4 + player[0], mapY)] == floor) {
                     spriteIndex = floorSprite;
                     color = 'fd9';
                 }
-                else if (mapData[key(mapX, mapY)] == potion) {
+                else if (mapData[key(viewX - 4 + player[0], mapY)] == potion) {
                     spriteIndex = potionSprite;
                     color = 640;
                 }
-                else if (mapData[key(mapX, mapY)] == stairs) {
+                else if (mapData[key(viewX - 4 + player[0], mapY)] == stairs) {
                     spriteIndex = level < 5 ? stairsSprite : playerSprite;
                 }
                 for (let i = 0; i < monsters.length; i++) {
                     if (monsters[i][2]
                         &&
-                            monsters[i][0] == mapX
+                            monsters[i][0] == viewX - 4 + player[0]
                         &&
                             monsters[i][1] == mapY) {
                         spriteIndex = monsterSprite;
@@ -189,7 +189,7 @@ let s = () => {
                             &&
                                 (xor ^ sprites.charCodeAt(spriteIndex * 7 + spriteY)) >> spriteX & 1)
                             ||
-                                !mapData[key(mapX, mapY)]) {
+                                !mapData[key(viewX - 4 + player[0], mapY)]) {
                             c.fillRect(spriteX * TILESIZE + drawX, spriteY * TILESIZE + drawY, TILESIZE, TILESIZE);
                         }
                     }
