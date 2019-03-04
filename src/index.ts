@@ -19,7 +19,7 @@ let s = () => {
   let potionSprite = 3
   let stairsSprite = 4
 
-  let key = ( x, y ) => x + ',' + y
+  let key = ( x, y ) => x + 'fd9' + y
 
   let level = 0
   let mapData: any
