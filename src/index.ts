@@ -141,9 +141,9 @@ let s = () => {
         ]
       }
 
-      if( level < 6 ){
-        let dir = ~~( Math.random() * 4 )
+      let dir = ~~( Math.random() * 4 )
 
+      if( level < 6 ){
         current = [
           current[ 0 ] + [ 0, -1, 1, 0 ][ dir ],
           current[ 1 ] + [ -1, 0, 0, 1 ][ dir ]

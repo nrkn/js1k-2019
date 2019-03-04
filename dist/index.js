@@ -86,8 +86,8 @@ let s = () => {
                     ~~(Math.random() * 5) + 1
                 ];
             }
+            let dir = ~~(Math.random() * 4);
             if (level < 6) {
-                let dir = ~~(Math.random() * 4);
                 current = [
                     current[0] + [0, -1, 1, 0][dir],
                     current[1] + [-1, 0, 0, 1][dir]
