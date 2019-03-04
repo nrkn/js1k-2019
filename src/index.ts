@@ -22,6 +22,7 @@ let s = () => {
   let key = ( x, y ) => x + 'fd9' + y
 
   let level = 0
+  //let level = 5
   let mapData: any
   let player: number[]
   let monsters: number[][]
@@ -112,6 +113,7 @@ let s = () => {
 
     let current = [ 0, 0 ]
     let size = 640
+    //let size = 10
 
     for ( let i = 0; i < ( size * ( level + 1 ) ); i++ ){
       mapData[ key(
@@ -139,12 +141,14 @@ let s = () => {
         ]
       }
 
-      let dir = ~~( Math.random() * 4 )
+      if( level < 6 ){
+        let dir = ~~( Math.random() * 4 )
 
-      current = [
-        current[ 0 ] + [ 0, -1, 1, 0 ][ dir ],
-        current[ 1 ] + [ -1, 0, 0, 1 ][ dir ]
-      ]
+        current = [
+          current[ 0 ] + [ 0, -1, 1, 0 ][ dir ],
+          current[ 1 ] + [ -1, 0, 0, 1 ][ dir ]
+        ]
+      }
     }
 
     mapData[ key(

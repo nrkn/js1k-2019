@@ -14,6 +14,7 @@ let s = () => {
     let stairsSprite = 4;
     let key = (x, y) => x + 'fd9' + y;
     let level = 0;
+    //let level = 5
     let mapData;
     let player;
     let monsters;
@@ -70,6 +71,7 @@ let s = () => {
         monsters = [];
         let current = [0, 0];
         let size = 640;
+        //let size = 10
         for (let i = 0; i < (size * (level + 1)); i++) {
             mapData[key(current[0], current[1])] = floor + ~~(Math.random() * 2);
             if ((current[0]) !== player[0] &&
@@ -84,11 +86,13 @@ let s = () => {
                     ~~(Math.random() * 5) + 1
                 ];
             }
-            let dir = ~~(Math.random() * 4);
-            current = [
-                current[0] + [0, -1, 1, 0][dir],
-                current[1] + [-1, 0, 0, 1][dir]
-            ];
+            if (level < 6) {
+                let dir = ~~(Math.random() * 4);
+                current = [
+                    current[0] + [0, -1, 1, 0][dir],
+                    current[1] + [-1, 0, 0, 1][dir]
+                ];
+            }
         }
         mapData[key(current[0], current[1])] = stairs;
     };
