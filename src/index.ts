@@ -32,12 +32,12 @@ let s = () => {
     for ( let viewY = 0; viewY < VIEWSIZE; viewY++ ) {
       for ( let viewX = 0; viewX < VIEWSIZE; viewX++ ) {
         let mapY = viewY - 4 + player[ 1 ]
-        let spriteIndex = -1
-        let color: string | number = 37 + 'fd9640'[ level ]
+        let spriteIndex = 7
+        let color: string | number = 38 + 'fd9640'[ level ]
 
         if( viewX == 4 && viewY == 4 ){
           spriteIndex = 0
-          color = 'fd9640'[ player[ 2 ] ] + 37
+          color = 'fd9640'[ player[ 2 ] ] + 38
         }
         else if (
           mapData[ key(
@@ -75,7 +75,7 @@ let s = () => {
             monsters[ i ][ 1 ] == mapY
           ) {
             spriteIndex = monsterSprite
-            color = 'fd9640'[ monsters[ i ][ 2 ] ] + 37
+            color = 'fd9640'[ monsters[ i ][ 2 ] ] + 38
           }
         }
 
@@ -85,7 +85,7 @@ let s = () => {
           for ( let spriteX = 0; spriteX < 7; spriteX++ ) {
             if (
               (
-                spriteIndex > -1
+                spriteIndex < 7
                 &&
                 ( xor ^ sprites.charCodeAt( spriteIndex * 7 + spriteY ) ) >> spriteX & 1
               )
@@ -122,7 +122,7 @@ let s = () => {
       ) ] = floor + ~~( Math.random() * 2 )
 
       if (
-        ( current[ 0 ] ) !== player[ 0 ] &&
+        current[ 0 ] !== player[ 0 ] &&
         !~~( Math.random() * ( size * ( level + 1 ) ) / ( level + 7 ) )
       ) {
         mapData[ key(
@@ -131,7 +131,7 @@ let s = () => {
         ) ] = potion
       }
       else if (
-        ( current[ 0 ] ) !== player[ 0 ] &&
+        current[ 0 ] !== player[ 0 ] &&
         !~~( Math.random() * ( size * ( level + 1 ) ) / ( level + 7 ) )
       ) {
         monsters[ monsters.length ] = [
@@ -161,16 +161,8 @@ let s = () => {
   draw()
 
   b.onkeydown = e => {
-    let x = (
-      e.which == 37 ? -1 :
-        e.which == 39 ? 1 :
-          0
-    )
-    let y = (
-      e.which == 38 ? -1 :
-      e.which == 40 ? 1 :
-      0
-    )
+    let x = e.which % 2 ? e.which - 38 : 0
+    let y = e.which % 2 ? 0 : e.which - 39
 
     for ( let i = 0; i < monsters.length; i++ ) {
       if ( x || y ) {
@@ -253,7 +245,7 @@ let s = () => {
       mapData[ key(
         player[ 0 ] + x,
         player[ 1 ] + y
-      ) ] = floor + ~~( Math.random() * 2 )
+      ) ] = floor
 
       if( player[ 2 ] < 5 )
         player[ 2 ]++

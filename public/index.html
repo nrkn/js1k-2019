@@ -153,11 +153,11 @@ let s = () => {
         for (let viewY = 0; viewY < VIEWSIZE; viewY++) {
             for (let viewX = 0; viewX < VIEWSIZE; viewX++) {
                 let mapY = viewY - 4 + player[1];
-                let spriteIndex = -1;
-                let color = 37 + 'fd9640'[level];
+                let spriteIndex = 7;
+                let color = 38 + 'fd9640'[level];
                 if (viewX == 4 && viewY == 4) {
                     spriteIndex = 0;
-                    color = 'fd9640'[player[2]] + 37;
+                    color = 'fd9640'[player[2]] + 38;
                 }
                 else if (mapData[key(viewX - 4 + player[0], mapY)] == floor) {
                     spriteIndex = floorSprite;
@@ -177,13 +177,13 @@ let s = () => {
                         &&
                             monsters[i][1] == mapY) {
                         spriteIndex = monsterSprite;
-                        color = 'fd9640'[monsters[i][2]] + 37;
+                        color = 'fd9640'[monsters[i][2]] + 38;
                     }
                 }
                 c.fillStyle = '#' + color;
                 for (let spriteY = 0; spriteY < 7; spriteY++) {
                     for (let spriteX = 0; spriteX < 7; spriteX++) {
-                        if ((spriteIndex > -1
+                        if ((spriteIndex < 7
                             &&
                                 (xor ^ sprites.charCodeAt(spriteIndex * 7 + spriteY)) >> spriteX & 1)
                             ||
@@ -204,11 +204,11 @@ let s = () => {
         //let size = 10
         for (let i = 0; i < (size * (level + 1)); i++) {
             mapData[key(current[0], current[1])] = floor + ~~(Math.random() * 2);
-            if ((current[0]) !== player[0] &&
+            if (current[0] !== player[0] &&
                 !~~(Math.random() * (size * (level + 1)) / (level + 7))) {
                 mapData[key(current[0], current[1])] = potion;
             }
-            else if ((current[0]) !== player[0] &&
+            else if (current[0] !== player[0] &&
                 !~~(Math.random() * (size * (level + 1)) / (level + 7))) {
                 monsters[monsters.length] = [
                     current[0],
@@ -229,12 +229,8 @@ let s = () => {
     createMap();
     draw();
     b.onkeydown = e => {
-        let x = (e.which == 37 ? -1 :
-            e.which == 39 ? 1 :
-                0);
-        let y = (e.which == 38 ? -1 :
-            e.which == 40 ? 1 :
-                0);
+        let x = e.which % 2 ? e.which - 38 : 0;
+        let y = e.which % 2 ? 0 : e.which - 39;
         for (let i = 0; i < monsters.length; i++) {
             if (x || y) {
                 let action = ~~(Math.random() * 4);
@@ -292,7 +288,7 @@ let s = () => {
             ];
         }
         else if (mapData[key(player[0] + x, player[1] + y)] == potion) {
-            mapData[key(player[0] + x, player[1] + y)] = floor + ~~(Math.random() * 2);
+            mapData[key(player[0] + x, player[1] + y)] = floor;
             if (player[2] < 5)
                 player[2]++;
         }
