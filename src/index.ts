@@ -4,8 +4,7 @@ declare const c: CanvasRenderingContext2D
 declare const d: Document
 
 let s = () => {
-  let sprites = '^AUA^R@N_U_U@@@@@@D@^LLRa^OSTUUDDDDND@'
-  let xor = 64
+  let sprites = 'a~j~a@mq`j`jassm^@a@plkjj@{{{{q{'
 
   let VIEWSIZE = 9
   let TILESIZE = 5
@@ -16,10 +15,9 @@ let s = () => {
   let sword = 7
   let playerSprite = 0
   let monsterSprite = 1
-  let floorSprite = 2
-  let potionSprite = 3
-  let stairsSprite = 4
-  let swordSprite = 5
+  let potionSprite = 2
+  let stairsSprite = 3
+  let swordSprite = 4
   let swordAmount = 1
 
   let level = 0
@@ -37,17 +35,6 @@ let s = () => {
         let color: string | number = 37 + 'fd9640'[ level ]
 
         if (
-          mapData[
-
-              ( viewX - 4 + mobs[ 0 ][ 0 ] )
-              + 'fd9640' +
-              ( viewY - 4 + mobs[ 0 ][ 1 ] )
-
-          ] == floor
-        ){
-          spriteIndex = floorSprite
-        }
-        else if (
           mapData[
 
               ( viewX - 4 + mobs[ 0 ][ 0 ] )
@@ -112,7 +99,11 @@ let s = () => {
               (
                 spriteIndex < 7
                 &&
-                ( xor ^ sprites.charCodeAt( spriteIndex * 7 + spriteY ) ) >> spriteX & 1
+                !(
+                  (
+                    sprites.charCodeAt( spriteIndex * 7 + spriteY )
+                  ) >> spriteX & 1
+                )
               )
               ||
               !mapData[
@@ -158,7 +149,7 @@ let s = () => {
           + 'fd9640' +
           ( current[ 1 ] )
 
-      ] = floor + ~~( Math.random() * 2 )
+      ] = floor
 
       if (
         current[ 0 ] !== mobs[ 0 ][ 0 ] &&
@@ -235,7 +226,7 @@ let s = () => {
             + 'fd9640' +
             ( mobs[ i ][ 1 ] + y )
 
-        ] < 5
+        ] == floor
       )
       &&
       // no other mob

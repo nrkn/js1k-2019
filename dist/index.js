@@ -1,7 +1,6 @@
 "use strict";
 let s = () => {
-    let sprites = '^AUA^R@N_U_U@@@@@@D@^LLRa^OSTUUDDDDND@';
-    let xor = 64;
+    let sprites = 'a~j~a@mq`j`jassm^@a@plkjj@{{{{q{';
     let VIEWSIZE = 9;
     let TILESIZE = 5;
     let floor = 3;
@@ -10,10 +9,9 @@ let s = () => {
     let sword = 7;
     let playerSprite = 0;
     let monsterSprite = 1;
-    let floorSprite = 2;
-    let potionSprite = 3;
-    let stairsSprite = 4;
-    let swordSprite = 5;
+    let potionSprite = 2;
+    let stairsSprite = 3;
+    let swordSprite = 4;
     let swordAmount = 1;
     let level = 0;
     //let level = 5
@@ -27,11 +25,6 @@ let s = () => {
                 let spriteIndex = 7;
                 let color = 37 + 'fd9640'[level];
                 if (mapData[(viewX - 4 + mobs[0][0])
-                    + 'fd9640' +
-                    (viewY - 4 + mobs[0][1])] == floor) {
-                    spriteIndex = floorSprite;
-                }
-                else if (mapData[(viewX - 4 + mobs[0][0])
                     + 'fd9640' +
                     (viewY - 4 + mobs[0][1])] == potion) {
                     spriteIndex = potionSprite;
@@ -69,7 +62,7 @@ let s = () => {
                             ||
                                 (spriteIndex < 7
                                     &&
-                                        (xor ^ sprites.charCodeAt(spriteIndex * 7 + spriteY)) >> spriteX & 1)
+                                        !((sprites.charCodeAt(spriteIndex * 7 + spriteY)) >> spriteX & 1))
                             ||
                                 !mapData[(viewX - 4 + mobs[0][0])
                                     + 'fd9640' +
@@ -94,7 +87,7 @@ let s = () => {
         for (let i = 0; i < (size * (level + 1)); i++) {
             mapData[(current[0])
                 + 'fd9640' +
-                (current[1])] = floor + ~~(Math.random() * 2);
+                (current[1])] = floor;
             if (current[0] !== mobs[0][0] &&
                 !~~(Math.random() * (size * (level + 1)) / (level + 7))) {
                 mapData[(current[0])
@@ -139,7 +132,7 @@ let s = () => {
         // dest is floor
         (mapData[(mobs[i][0] + x)
             + 'fd9640' +
-            (mobs[i][1] + y)] < 5)
+            (mobs[i][1] + y)] == floor)
             &&
                 // no other mob
                 !mobs[(mobs[i][0] + x)
