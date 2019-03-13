@@ -477,7 +477,7 @@ let s = () => {
                 ( mobs[ i ][ 1 ] + y )
               ] = 0
 
-              // maybe drop a sword
+              // maybe drop something
               if (
                 !~~( Math.random() * 5 )
               ) {
@@ -485,7 +485,9 @@ let s = () => {
                   ( mobs[ i ][ 0 ] + x )
                   + 'fd9640' +
                   ( mobs[ i ][ 1 ] + y )
-                ] = sword
+                ] =
+                // drop a potion if sword is full
+                swordAmount < 5 ? sword : potion
               }
             }
           }

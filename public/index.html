@@ -169,10 +169,6 @@ let s = () => {
         // draw the map tiles within the viewport
         for (let viewY = 0; viewY < VIEWSIZE; viewY++) {
             for (let viewX = 0; viewX < VIEWSIZE; viewX++) {
-                /*
-                  see if there is a sprite at this map position, we use 7 as the guard
-                  for "no sprite here"
-                */
                 let spriteIndex = (
                 /*
                   note the weird mapData[ x + 'string' + y ] pattern here
@@ -187,6 +183,8 @@ let s = () => {
                   we join the x and y together with the most common string from the
                   rest of the code to assist with packing
                 */
+                // do we have a mob at this location and is it alive, if so use
+                // its sprite
                 mobs[(viewX - 4 + mobs[0][0])
                     + 'fd9640' +
                     (viewY - 4 + mobs[0][1])]
@@ -197,64 +195,47 @@ let s = () => {
                     mobs[(viewX - 4 + mobs[0][0])
                         + 'fd9640' +
                         (viewY - 4 + mobs[0][1])][3] :
+                    // or potion on map?
                     mapData[(viewX - 4 + mobs[0][0])
                         + 'fd9640' +
                         (viewY - 4 + mobs[0][1])] == potion ?
                         potionSprite :
+                        // or sword on map?
                         mapData[(viewX - 4 + mobs[0][0])
                             + 'fd9640' +
                             (viewY - 4 + mobs[0][1])] == sword ?
                             swordSprite :
+                            // or stairs
                             mapData[(viewX - 4 + mobs[0][0])
                                 + 'fd9640' +
                                 (viewY - 4 + mobs[0][1])] == stairs ?
                                 // on the last level show exit sprite instead of stairs
                                 level < 5 ? stairsSprite : exitSprite :
+                                // nothing, use the guard value
                                 7);
-                c.fillStyle = (mobs[(viewX - 4 + mobs[0][0])
+                c.fillStyle = (
+                // mob (monster or player) here and it's alive?
+                mobs[(viewX - 4 + mobs[0][0])
                     + 'fd9640' +
                     (viewY - 4 + mobs[0][1])]
                     &&
                         mobs[(viewX - 4 + mobs[0][0])
                             + 'fd9640' +
                             (viewY - 4 + mobs[0][1])][2] ?
+                    /*
+                      this charming piece of code makes the mob's color shift towards
+                      red when its health is low
+                    */
                     '#' + 'fd9640'[mobs[(viewX - 4 + mobs[0][0])
                         + 'fd9640' +
                         (viewY - 4 + mobs[0][1])][2]] + 37 :
-                    // is there a sprite?
+                    // otherwise, is there a sprite, any sprite?
                     mapData[(viewX - 4 + mobs[0][0])
                         + 'fd9640' +
                         (viewY - 4 + mobs[0][1])] ?
                         '#' + 964 :
-                        // use different colored walls for each level
+                        // must be a wall, use different colored walls for each level
                         '#' + 37 + 'fd9640'[level]);
-                // check if we have a monster or player here
-                // todo - mobs array has references to mobs as properties as well as
-                // indexers - can we just use that here, will it save bytes?
-                // if(
-                //   mobs[
-                //     ( viewX - 4 + mobs[ 0 ][ 0 ] )
-                //     + 'fd9640' +
-                //     ( viewY - 4 + mobs[ 0 ][ 1 ] )
-                //   ][ 2 ]
-                // )
-                // for ( let i = 0; i < mobs.length; i++ ) {
-                //   if (
-                //     mobs[ i ][ 2 ]
-                //     &&
-                //     mobs[ i ][ 0 ] == viewX - 4 + mobs[ 0 ][ 0 ]
-                //     &&
-                //     mobs[ i ][ 1 ] == viewY - 4 + mobs[ 0 ][ 1 ]
-                //   ) {
-                //     // mobs[][ 3 ] is the spriteIndex for the mob, monster or player
-                //     spriteIndex = mobs[ i ][ 3 ]
-                //     /*
-                //       color it according to how much health it has left, towards red
-                //       as it gets lower
-                //     */
-                //     c.fillStyle = '#' + 'fd9640'[ mobs[ i ][ 2 ] ] + 37
-                //   }
-                // }
                 // iterate over the pixels for the current sprite
                 for (let spriteY = 0; spriteY < 7; spriteY++) {
                     for (let spriteX = 0; spriteX < 7; spriteX++) {
@@ -494,11 +475,13 @@ let s = () => {
                             mobs[(mobs[i][0] + x)
                                 + 'fd9640' +
                                 (mobs[i][1] + y)] = 0;
-                            // maybe drop a sword
+                            // maybe drop something
                             if (!~~(Math.random() * 5)) {
                                 mapData[(mobs[i][0] + x)
                                     + 'fd9640' +
-                                    (mobs[i][1] + y)] = sword;
+                                    (mobs[i][1] + y)] =
+                                    // drop a potion if sword is full
+                                    swordAmount < 5 ? sword : potion;
                             }
                         }
                     }
