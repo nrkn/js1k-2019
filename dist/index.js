@@ -1,6 +1,6 @@
 "use strict";
 let s = () => {
-    let sprites = '^AUA^R@N_U_U@@@@@@U@^LLRa^OSTUUDDDDND@';
+    let sprites = '^AUA^R@N_U_U@@@@@@D@^LLRa^OSTUUDDDDND@';
     let xor = 64;
     let VIEWSIZE = 9;
     let TILESIZE = 5;
@@ -29,15 +29,12 @@ let s = () => {
                 let color = 38 + 'fd9640'[level];
                 if (mapData[key(viewX - 4 + mobs[0][0], mapY)] == floor) {
                     spriteIndex = floorSprite;
-                    color = 'fd9';
                 }
                 else if (mapData[key(viewX - 4 + mobs[0][0], mapY)] == potion) {
                     spriteIndex = potionSprite;
-                    color = 640;
                 }
                 else if (mapData[key(viewX - 4 + mobs[0][0], mapY)] == sword) {
                     spriteIndex = swordSprite;
-                    color = 640;
                 }
                 else if (mapData[key(viewX - 4 + mobs[0][0], mapY)] == stairs) {
                     spriteIndex = level < 5 ? stairsSprite : playerSprite;
