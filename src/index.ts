@@ -30,7 +30,7 @@ let s = () => {
   let draw = () => {
     // start draw
 
-    a.width = a.height = VIEWSIZE * 7 * TILESIZE
+    a.width = VIEWSIZE * 7 * TILESIZE
     for ( let viewY = 0; viewY < VIEWSIZE; viewY++ ) {
       for ( let viewX = 0; viewX < VIEWSIZE; viewX++ ) {
         let spriteIndex = 7
