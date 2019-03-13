@@ -3,12 +3,25 @@ declare const b: HTMLBodyElement
 declare const c: CanvasRenderingContext2D
 declare const d: Document
 
+// closure so that uglify won't treat any variables as local
 let s = () => {
+  /*
+    6x7 1-bit sprites packed into chars - drawn as 7x7 to have square tiles
+
+    You can use 7x7 but for it to fit into the printable ascii range so you can
+    put it in a normal javascript string, the high bit has to be set, so if you
+    have a sprite that doesn't use the 7th column you have to find some value
+    you can xor the charcodes with so that all the rows still fit in the
+    printable ascii range (therefore 1byte per char in utf8).
+
+    It's a clever solution but you can save the bytes you'd use doing this by
+    just making them 1 column smaller instead.
+  */
   let sprites = 'a~j~a@mq`j`jassm^@a@plkjj@{{{{q{@bTHTb'
 
+  // constants will get inlined
   let VIEWSIZE = 9
   let TILESIZE = 5
-
   let floor = 3
   let potion = 5
   let stairs = 6
@@ -21,66 +34,128 @@ let s = () => {
   let exitSprite = 5
   let swordAmount = 1
 
+  // global state
   let level = 0
-  //let level = 5
   let mapData: any
   let mobs: number[][]
 
   let draw = () => {
     // start draw
 
+    // clear the canvas
     a.width = VIEWSIZE * 7 * TILESIZE
+    // draw the map tiles within the viewport
     for ( let viewY = 0; viewY < VIEWSIZE; viewY++ ) {
       for ( let viewX = 0; viewX < VIEWSIZE; viewX++ ) {
         let spriteIndex = (
+          /*
+            note the weird mapData[ x + 'string' + y ] pattern here
+
+            first use of this pattern - basically we join the x and y together
+            with an arbitrary string and use it for a key into the mapData
+            object
+
+            by making mapData an object instead of an array we don't have to
+            worry about out of bounds and etc
+
+            we join the x and y together with the most common string from the
+            rest of the code to assist with packing
+          */
+
+          // do we have a mob at this location and is it alive, if so use
+          // its sprite
+          mobs[
+            ( viewX - 4 + mobs[ 0 ][ 0 ] )
+            + 'fd9640' +
+            ( viewY - 4 + mobs[ 0 ][ 1 ] )
+          ]
+          &&
+          mobs[
+            ( viewX - 4 + mobs[ 0 ][ 0 ] )
+            + 'fd9640' +
+            ( viewY - 4 + mobs[ 0 ][ 1 ] )
+          ][ 2 ] ?
+          mobs[
+            ( viewX - 4 + mobs[ 0 ][ 0 ] )
+            + 'fd9640' +
+            ( viewY - 4 + mobs[ 0 ][ 1 ] )
+          ][ 3 ] :
+
+          // or potion on map?
           mapData[
               ( viewX - 4 + mobs[ 0 ][ 0 ] )
               + 'fd9640' +
               ( viewY - 4 + mobs[ 0 ][ 1 ] )
           ] == potion ?
           potionSprite :
+
+          // or sword on map?
           mapData[
               ( viewX - 4 + mobs[ 0 ][ 0 ] )
               + 'fd9640' +
               ( viewY - 4 + mobs[ 0 ][ 1 ] )
           ] == sword ?
           swordSprite :
+
+          // or stairs
           mapData[
               ( viewX - 4 + mobs[ 0 ][ 0 ] )
               + 'fd9640' +
               ( viewY - 4 + mobs[ 0 ][ 1 ] )
           ] == stairs ?
+          // on the last level show exit sprite instead of stairs
           level < 5 ? stairsSprite : exitSprite :
+
+          // nothing, use the guard value
           7
         )
 
         c.fillStyle = (
+          // mob (monster or player) here and it's alive?
+          mobs[
+            ( viewX - 4 + mobs[ 0 ][ 0 ] )
+            + 'fd9640' +
+            ( viewY - 4 + mobs[ 0 ][ 1 ] )
+          ]
+          &&
+          mobs[
+            ( viewX - 4 + mobs[ 0 ][ 0 ] )
+            + 'fd9640' +
+            ( viewY - 4 + mobs[ 0 ][ 1 ] )
+          ][ 2 ] ?
+          /*
+            this charming piece of code makes the mob's color shift towards
+            red when its health is low
+          */
+          '#' + 'fd9640'[
+            mobs[
+              ( viewX - 4 + mobs[ 0 ][ 0 ] )
+              + 'fd9640' +
+              ( viewY - 4 + mobs[ 0 ][ 1 ] )
+            ][ 2 ]
+          ] + 37 :
+
+          // otherwise, is there a sprite, any sprite?
           mapData[
             ( viewX - 4 + mobs[ 0 ][ 0 ] )
             + 'fd9640' +
             ( viewY - 4 + mobs[ 0 ][ 1 ] )
           ] ?
           '#' + 964 :
+
+          // must be a wall, use different colored walls for each level
           '#' + 37 + 'fd9640'[ level ]
         )
 
-        for ( let i = 0; i < mobs.length; i++ ) {
-          if (
-            mobs[ i ][ 2 ]
-            &&
-            mobs[ i ][ 0 ] == viewX - 4 + mobs[ 0 ][ 0 ]
-            &&
-            mobs[ i ][ 1 ] == viewY - 4 + mobs[ 0 ][ 1 ]
-          ) {
-            spriteIndex = mobs[ i ][ 3 ]
-            c.fillStyle = '#' + 'fd9640'[ mobs[ i ][ 2 ] ] + 37
-          }
-        }
-
+        // iterate over the pixels for the current sprite
         for ( let spriteY = 0; spriteY < 7; spriteY++ ) {
           for ( let spriteX = 0; spriteX < 7; spriteX++ ) {
             if (
               (
+                /*
+                  if it's the player, draw a sword in the last row. as the
+                  player picks up more sword upgrades, the sword gets bigger
+                */
                 spriteIndex == playerSprite
                 &&
                 spriteX == 6
@@ -91,6 +166,7 @@ let s = () => {
               )
               ||
               (
+                // if there's a sprite, true if the bit is set at this pixel
                 spriteIndex < 7
                 &&
                 !(
@@ -100,6 +176,7 @@ let s = () => {
                 )
               )
               ||
+              // there's no map data, it will draw a wall
               !mapData[
                   ( viewX - 4 + mobs[ 0 ][ 0 ] )
                   + 'fd9640' +
@@ -107,7 +184,8 @@ let s = () => {
               ]
             ) {
               c.fillRect(
-                spriteX * TILESIZE + viewX * 7 * TILESIZE, spriteY * TILESIZE + viewY * 7 * TILESIZE,
+                spriteX * TILESIZE + viewX * 7 * TILESIZE,
+                spriteY * TILESIZE + viewY * 7 * TILESIZE,
                 TILESIZE, TILESIZE
               )
             }
@@ -119,27 +197,40 @@ let s = () => {
     // end draw
   }
 
+  // generate a new random map
   let createMap = ( health: number ) => {
+    // initalise the tile currently being randomly added, first is always 0,0
     let current = [ 0, 0 ]
+    // base size of the map
     let size = 96
 
+    // reset state
     mapData = {}
+    /*
+      add the player as the first mob
+      if we went down a level restore the player's health to what it was
+    */
     mobs = [ [ 0, 0, health, 0 ] ]
+    /*
+      mobs is an array AND an object, that way we can iterate over it but
+      also get a mob at a specific position without having to iterate over it
+    */
     mobs[
         ( 0 )
         + 'fd9640' +
         ( 0 )
     ] = mobs[ 0 ]
 
-    //let size = 10
-
+    // randomly add tiles to the map, as the level gets higher make it bigger
     for ( let i = 0; i < ( size * ( level + 1 ) ); i++ ){
+      // by default it will be a floor tile
       mapData[
           ( current[ 0 ] )
           + 'fd9640' +
           ( current[ 1 ] )
       ] = floor
 
+      // but some chance of it being a potion
       if (
         current[ 0 ] !== mobs[ 0 ][ 0 ] &&
         !~~( Math.random() * ( size * ( level + 1 ) ) / ( level + 7 ) )
@@ -150,6 +241,7 @@ let s = () => {
             ( current[ 1 ] )
         ] = potion
       }
+      // or a monster
       else if (
         current[ 0 ] !== mobs[ 0 ][ 0 ]
         &&
@@ -161,6 +253,11 @@ let s = () => {
             ( current[ 1 ] )
         ]
       ) {
+        /*
+          create a new monster, place it at the end of the mobs array, then
+          also add it to the array as a property so we can look up mobs by
+          position without iterating
+        */
         mobs[
             ( current[ 0 ] )
             + 'fd9640' +
@@ -173,9 +270,16 @@ let s = () => {
         ]
       }
 
+      // now pick a random direction to add to the map next
       let dir = ~~( Math.random() * 4 )
 
+      /*
+        when the player wins we don't generate anything, so the level generated
+        after triggering the exit is empty, it causes a graphical glitch
+        which makes a nice win screen
+      */
       if( level < 6 ){
+        // make the current tile the tile in the new direction
         current = [
           current[ 0 ] + [ 0, -1, 1, 0 ][ dir ],
           current[ 1 ] + [ -1, 0, 0, 1 ][ dir ]
@@ -183,6 +287,7 @@ let s = () => {
       }
     }
 
+    // make the last tile visited the stairs to the next level
     mapData[
         ( current[ 0 ] )
         + 'fd9640' +
@@ -190,35 +295,43 @@ let s = () => {
     ] = stairs
   }
 
-  let move = ( i: number, which: number ) => {
-    // start move
-
-
-
-    // end move
-  }
-
+  // key handler, triggers the game loop
   b.onkeydown = e => {
+    // iterate over all mobs including player
     for ( let i = 0; i < mobs.length; i++ ) {
+      // the damage the players sword will do this turn if it hits a monster
       let damage = ~~( Math.random() * swordAmount ) + 1
+      // a random action for monsters to take
       let action = ~~( Math.random() * 4 )
+      // will hold a code to determine movement
       let which: number
 
+      /*
+        which will get overridden if it's the player, but if it's a monster:
+      */
+      // move in a random direction 50% of the time
       if ( action < 2 ) {
         which = ~~( Math.random() * 4 ) + 37
-      } else if ( action < 3 ) {
+      }
+      // try to move towards the player on the x axis
+      else if ( action < 3 ) {
         which = mobs[ 0 ][ 0 ] < mobs[ i ][ 0 ] ? 37 : 39
-      } else {
+      }
+      // try to move towards the player on the y axis
+      else {
         which = mobs[ 0 ][ 1 ] < mobs[ i ][ 1 ] ? 38 : 40
       }
 
+      // only process mobs which are alive - health is stored in mobs[][2]
       if( mobs[ i ][ 2 ] ){
+        // if i is 0 it's the player, use the keycode from the event
         which = i ? which : e.which
 
+        // left and right modifier
         let x = which == 37 ? -1 : which == 39 ? 1 : 0
+        // up and down modifier
         let y = which == 38 ? -1 : which == 40 ? 1 : 0
 
-        // dest is floor, move
         if (
           // dest is floor
           (
@@ -229,29 +342,31 @@ let s = () => {
             ] == floor
           )
           &&
-          // no other mob
+          // no other mob here
           !mobs[
-          ( mobs[ i ][ 0 ] + x )
-          + 'fd9640' +
-          ( mobs[ i ][ 1 ] + y )
+            ( mobs[ i ][ 0 ] + x )
+            + 'fd9640' +
+            ( mobs[ i ][ 1 ] + y )
           ]
         ) {
+          // delete the mob from the array properties at the old location
           mobs[
             ( mobs[ i ][ 0 ] )
             + 'fd9640' +
             ( mobs[ i ][ 1 ] )
           ] = 0
 
+          // update the mobs position to the new location
           mobs[ i ][ 0 ] = mobs[ i ][ 0 ] + x
           mobs[ i ][ 1 ] = mobs[ i ][ 1 ] + y
 
+          // re-add the mob as a property of the array at the new location
           mobs[
             ( mobs[ i ][ 0 ] )
             + 'fd9640' +
             ( mobs[ i ][ 1 ] )
           ] = mobs[ i ]
         }
-        // dest is another mob, attack
         else if (
           // dest is another mob
           mobs[
@@ -290,6 +405,7 @@ let s = () => {
               ( mobs[ i ][ 1 ] + y )
               ][ 2 ]
             ) {
+              // reset some of the state
               level = 0
               swordAmount = 1
               createMap( 5 )
@@ -300,27 +416,29 @@ let s = () => {
             // current mob is player
             !i
             &&
-            // mob is not already dead
+            // there is a mob here
             mobs[
             ( mobs[ i ][ 0 ] + x )
             + 'fd9640' +
             ( mobs[ i ][ 1 ] + y )
             ]
             &&
+            // mob is not already dead
             mobs[
             ( mobs[ i ][ 0 ] + x )
             + 'fd9640' +
             ( mobs[ i ][ 1 ] + y )
             ][ 2 ]
           ) {
-            //decrement health
             if (
+              // monster is still alive
               mobs[
               ( mobs[ i ][ 0 ] + x )
               + 'fd9640' +
               ( mobs[ i ][ 1 ] + y )
               ][ 2 ]
             ) {
+              //decrement monster health according to damage determined earlier
               mobs[
                 ( mobs[ i ][ 0 ] + x )
                 + 'fd9640' +
@@ -334,26 +452,32 @@ let s = () => {
               ][ 2 ] - damage
             }
 
-            // if dead remove
             if (
+              // health is 0 or less
               mobs[
                 ( mobs[ i ][ 0 ] + x )
                 + 'fd9640' +
                 ( mobs[ i ][ 1 ] + y )
               ][ 2 ] <= 0
             ) {
+              /*
+                set health to zero in case it was negative so we can test it for
+                falsiness, negatives are truthy
+              */
               mobs[
                 ( mobs[ i ][ 0 ] + x )
                 + 'fd9640' +
                 ( mobs[ i ][ 1 ] + y )
               ][ 2 ] = 0
 
+              // delete it from the array properties
               mobs[
                 ( mobs[ i ][ 0 ] + x )
                 + 'fd9640' +
                 ( mobs[ i ][ 1 ] + y )
               ] = 0
 
+              // maybe drop a sword
               if (
                 !~~( Math.random() * 5 )
               ) {
@@ -373,9 +497,9 @@ let s = () => {
           &&
           // is potion
           mapData[
-          ( mobs[ i ][ 0 ] + x )
-          + 'fd9640' +
-          ( mobs[ i ][ 1 ] + y )
+            ( mobs[ i ][ 0 ] + x )
+            + 'fd9640' +
+            ( mobs[ i ][ 1 ] + y )
           ] == potion
         ) {
           // remove the potion
@@ -395,12 +519,12 @@ let s = () => {
           &&
           // is sword
           mapData[
-          ( mobs[ i ][ 0 ] + x )
-          + 'fd9640' +
-          ( mobs[ i ][ 1 ] + y )
+            ( mobs[ i ][ 0 ] + x )
+            + 'fd9640' +
+            ( mobs[ i ][ 1 ] + y )
           ] == sword
         ) {
-          // remove the sword
+          // remove the sword from the map
           mapData[
             ( mobs[ i ][ 0 ] + x )
             + 'fd9640' +
@@ -418,12 +542,14 @@ let s = () => {
           &&
           // is stairs
           mapData[
-          ( mobs[ i ][ 0 ] + x )
-          + 'fd9640' +
-          ( mobs[ i ][ 1 ] + y )
+            ( mobs[ i ][ 0 ] + x )
+            + 'fd9640' +
+            ( mobs[ i ][ 1 ] + y )
           ] == stairs
         ) {
+          // generate a new level
           level++
+          // have to pass player health through so it doesn't get lost
           createMap( mobs[ i ][ 2 ] )
         }
       }
@@ -432,6 +558,7 @@ let s = () => {
     draw()
   }
 
+  // first run, set the player's initial health and draw
   createMap( 5 )
   draw()
 }
