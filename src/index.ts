@@ -17,7 +17,7 @@ let s = () => {
     It's a clever solution but you can save the bytes you'd use doing this by
     just making them 1 column smaller instead.
   */
-  let sprites = 'a~j~a@mq`j`jassm^@a@plkjj@{{{{q{@bTHTb'
+  let sprites = 'a~j~a@mq`j`jassm^@a@plkjj@{{{{q{@bTHTbmaua@m'
 
   // constants will get inlined
   let VIEWSIZE = 9
@@ -32,6 +32,7 @@ let s = () => {
   let stairsSprite = 3
   let swordSprite = 4
   let exitSprite = 5
+  let monster2Sprite = 6
   let swordAmount = 1
 
   // global state
@@ -266,7 +267,7 @@ let s = () => {
           current[ 0 ],
           current[ 1 ],
           ~~( Math.random() * 5 ) + 1,
-          monsterSprite
+          ~~( Math.random() * 2 ) ? monsterSprite : monster2Sprite
         ]
       }
 
