@@ -1,6 +1,6 @@
 "use strict";
 let s = () => {
-    let sprites = 'a~j~a@mq`j`jnu{un@plkjj@';
+    let sprites = 'a~j~a@mq`j`jassm^@a@plkjj@{{{{q{';
     let VIEWSIZE = 9;
     let TILESIZE = 5;
     let floor = 3;
@@ -11,7 +11,7 @@ let s = () => {
     let monsterSprite = 1;
     let potionSprite = 2;
     let stairsSprite = 3;
-    let swordSprite = 2;
+    let swordSprite = 4;
     let swordAmount = 1;
     let level = 0;
     //let level = 5
@@ -23,7 +23,6 @@ let s = () => {
         for (let viewY = 0; viewY < VIEWSIZE; viewY++) {
             for (let viewX = 0; viewX < VIEWSIZE; viewX++) {
                 let spriteIndex = 7;
-                //let color: string | number = 37 + 'fd9640'[ level ]
                 if (mapData[(viewX - 4 + mobs[0][0])
                     + 'fd9640' +
                     (viewY - 4 + mobs[0][1])] == potion) {
@@ -123,143 +122,8 @@ let s = () => {
             (current[1])] = stairs;
     };
     let move = (i, which) => {
-        let x = which == 37 ? -1 : which == 39 ? 1 : 0;
-        let y = which == 38 ? -1 : which == 40 ? 1 : 0;
-        // dest is floor, move
-        if (
-        // dest is floor
-        (mapData[(mobs[i][0] + x)
-            + 'fd9640' +
-            (mobs[i][1] + y)] == floor)
-            &&
-                // no other mob
-                !mobs[(mobs[i][0] + x)
-                    + 'fd9640' +
-                    (mobs[i][1] + y)]) {
-            mobs[(mobs[i][0])
-                + 'fd9640' +
-                (mobs[i][1])] = 0;
-            mobs[i][0] = mobs[i][0] + x;
-            mobs[i][1] = mobs[i][1] + y;
-            mobs[(mobs[i][0])
-                + 'fd9640' +
-                (mobs[i][1])] = mobs[i];
-        }
-        // dest is another mob, attack
-        else if (
-        // dest is another mob
-        mobs[(mobs[i][0] + x)
-            + 'fd9640' +
-            (mobs[i][1] + y)]) {
-            // monster attacks player
-            if (
-            // current mob is not player
-            i
-                &&
-                    // target is player
-                    !mobs[(mobs[i][0] + x)
-                        + 'fd9640' +
-                        (mobs[i][1] + y)][3]
-                &&
-                    // 50% chance to hit
-                    ~~(Math.random() * 2)) {
-                // decrement player health
-                mobs[(mobs[i][0] + x)
-                    + 'fd9640' +
-                    (mobs[i][1] + y)][2]--;
-                // if player dead, restart
-                if (!mobs[(mobs[i][0] + x)
-                    + 'fd9640' +
-                    (mobs[i][1] + y)][2]) {
-                    level = 0;
-                    swordAmount = 1;
-                    createMap(5);
-                }
-            }
-            // player attacks mob
-            else if (
-            // current mob is player
-            !i
-                &&
-                    // mob is not already dead
-                    mobs[(mobs[i][0] + x)
-                        + 'fd9640' +
-                        (mobs[i][1] + y)]
-                &&
-                    mobs[(mobs[i][0] + x)
-                        + 'fd9640' +
-                        (mobs[i][1] + y)][2]) {
-                //decrement health
-                let damage = ~~(Math.random() * swordAmount) + 1;
-                for (let j = 0; j < damage; j++) {
-                    if (mobs[(mobs[i][0] + x)
-                        + 'fd9640' +
-                        (mobs[i][1] + y)][2]) {
-                        mobs[(mobs[i][0] + x)
-                            + 'fd9640' +
-                            (mobs[i][1] + y)][2]--;
-                    }
-                }
-                // if dead remove
-                if (!mobs[(mobs[i][0] + x)
-                    + 'fd9640' +
-                    (mobs[i][1] + y)][2]) {
-                    mobs[(mobs[i][0] + x)
-                        + 'fd9640' +
-                        (mobs[i][1] + y)] = 0;
-                    if (!~~(Math.random() * 5)) {
-                        mapData[(mobs[i][0] + x)
-                            + 'fd9640' +
-                            (mobs[i][1] + y)] = sword;
-                    }
-                }
-            }
-        }
-        // dest is potion, take
-        else if (
-        // current mob is player
-        !i
-            &&
-                // is potion
-                mapData[(mobs[i][0] + x)
-                    + 'fd9640' +
-                    (mobs[i][1] + y)] == potion) {
-            // remove the potion
-            mapData[(mobs[i][0] + x)
-                + 'fd9640' +
-                (mobs[i][1] + y)] = floor;
-            // if player health not already max increment
-            if (mobs[i][2] < 5)
-                mobs[i][2]++;
-        }
-        else if (
-        // current mob is player
-        !i
-            &&
-                // is sword
-                mapData[(mobs[i][0] + x)
-                    + 'fd9640' +
-                    (mobs[i][1] + y)] == sword) {
-            // remove the sword
-            mapData[(mobs[i][0] + x)
-                + 'fd9640' +
-                (mobs[i][1] + y)] = floor;
-            // if sword amount not max increment
-            if (swordAmount < 5)
-                swordAmount++;
-        }
-        // dest is stairs, go down
-        else if (
-        // current mob is player
-        !i
-            &&
-                // is stairs
-                mapData[(mobs[i][0] + x)
-                    + 'fd9640' +
-                    (mobs[i][1] + y)] == stairs) {
-            level++;
-            createMap(mobs[i][2]);
-        }
+        // start move
+        // end move
     };
     b.onkeydown = e => {
         for (let i = 0; i < mobs.length; i++) {
@@ -274,8 +138,146 @@ let s = () => {
             else {
                 which = mobs[0][1] < mobs[i][1] ? 38 : 40;
             }
-            if (mobs[i][2])
-                move(i, !i ? e.which : which);
+            if (mobs[i][2]) {
+                which = i ? which : e.which;
+                let x = which == 37 ? -1 : which == 39 ? 1 : 0;
+                let y = which == 38 ? -1 : which == 40 ? 1 : 0;
+                // dest is floor, move
+                if (
+                // dest is floor
+                (mapData[(mobs[i][0] + x)
+                    + 'fd9640' +
+                    (mobs[i][1] + y)] == floor)
+                    &&
+                        // no other mob
+                        !mobs[(mobs[i][0] + x)
+                            + 'fd9640' +
+                            (mobs[i][1] + y)]) {
+                    mobs[(mobs[i][0])
+                        + 'fd9640' +
+                        (mobs[i][1])] = 0;
+                    mobs[i][0] = mobs[i][0] + x;
+                    mobs[i][1] = mobs[i][1] + y;
+                    mobs[(mobs[i][0])
+                        + 'fd9640' +
+                        (mobs[i][1])] = mobs[i];
+                }
+                // dest is another mob, attack
+                else if (
+                // dest is another mob
+                mobs[(mobs[i][0] + x)
+                    + 'fd9640' +
+                    (mobs[i][1] + y)]) {
+                    // monster attacks player
+                    if (
+                    // current mob is not player
+                    i
+                        &&
+                            // target is player
+                            !mobs[(mobs[i][0] + x)
+                                + 'fd9640' +
+                                (mobs[i][1] + y)][3]
+                        &&
+                            // 50% chance to hit
+                            ~~(Math.random() * 2)) {
+                        // decrement player health
+                        mobs[(mobs[i][0] + x)
+                            + 'fd9640' +
+                            (mobs[i][1] + y)][2]--;
+                        // if player dead, restart
+                        if (!mobs[(mobs[i][0] + x)
+                            + 'fd9640' +
+                            (mobs[i][1] + y)][2]) {
+                            level = 0;
+                            swordAmount = 1;
+                            createMap(5);
+                        }
+                    }
+                    // player attacks mob
+                    else if (
+                    // current mob is player
+                    !i
+                        &&
+                            // mob is not already dead
+                            mobs[(mobs[i][0] + x)
+                                + 'fd9640' +
+                                (mobs[i][1] + y)]
+                        &&
+                            mobs[(mobs[i][0] + x)
+                                + 'fd9640' +
+                                (mobs[i][1] + y)][2]) {
+                        //decrement health
+                        let damage = ~~(Math.random() * swordAmount) + 1;
+                        for (let j = 0; j < damage; j++) {
+                            if (mobs[(mobs[i][0] + x)
+                                + 'fd9640' +
+                                (mobs[i][1] + y)][2]) {
+                                mobs[(mobs[i][0] + x)
+                                    + 'fd9640' +
+                                    (mobs[i][1] + y)][2]--;
+                            }
+                        }
+                        // if dead remove
+                        if (!mobs[(mobs[i][0] + x)
+                            + 'fd9640' +
+                            (mobs[i][1] + y)][2]) {
+                            mobs[(mobs[i][0] + x)
+                                + 'fd9640' +
+                                (mobs[i][1] + y)] = 0;
+                            if (!~~(Math.random() * 5)) {
+                                mapData[(mobs[i][0] + x)
+                                    + 'fd9640' +
+                                    (mobs[i][1] + y)] = sword;
+                            }
+                        }
+                    }
+                }
+                // dest is potion, take
+                else if (
+                // current mob is player
+                !i
+                    &&
+                        // is potion
+                        mapData[(mobs[i][0] + x)
+                            + 'fd9640' +
+                            (mobs[i][1] + y)] == potion) {
+                    // remove the potion
+                    mapData[(mobs[i][0] + x)
+                        + 'fd9640' +
+                        (mobs[i][1] + y)] = floor;
+                    // if player health not already max increment
+                    if (mobs[i][2] < 5)
+                        mobs[i][2]++;
+                }
+                else if (
+                // current mob is player
+                !i
+                    &&
+                        // is sword
+                        mapData[(mobs[i][0] + x)
+                            + 'fd9640' +
+                            (mobs[i][1] + y)] == sword) {
+                    // remove the sword
+                    mapData[(mobs[i][0] + x)
+                        + 'fd9640' +
+                        (mobs[i][1] + y)] = floor;
+                    // if sword amount not max increment
+                    if (swordAmount < 5)
+                        swordAmount++;
+                }
+                // dest is stairs, go down
+                else if (
+                // current mob is player
+                !i
+                    &&
+                        // is stairs
+                        mapData[(mobs[i][0] + x)
+                            + 'fd9640' +
+                            (mobs[i][1] + y)] == stairs) {
+                    level++;
+                    createMap(mobs[i][2]);
+                }
+            }
         }
         draw();
     };
