@@ -49,6 +49,10 @@ Arrow keys to move, bump to use/attack/get
 
 ## A Visual Development History
 
+NB, this only shows some interesting milestones, there are a lot more
+[commits](https://github.com/nrkn/js1k-2019/commits/master) involving all kinds
+of golfing, experimenting, abandoned features, bug fixes etc.
+
 #### [47c5903123f6a9207bfab96ab21c4a62ab7ca7e9](https://github.com/nrkn/js1k-2019/tree/47c5903123f6a9207bfab96ab21c4a62ab7ca7e9)
 
 At this stage I was planning to make a 1k version of my JS13k game,
@@ -129,6 +133,41 @@ many bytes and came up with this:
 
 Some text or something saying "you win!" would have been nice, but wayyy too
 many bytes!
+
+#### [819b253b0c1eeff93ffefa8becbe9bf68579e035](https://github.com/nrkn/js1k-2019/tree/819b253b0c1eeff93ffefa8becbe9bf68579e035)
+
+The final thing I wanted was for the player to be able to have a weapon, and
+for the monsters to drop sword upgrades and potions so that there is a reason
+to fight them, rather than just trying to avoid them and get to the bottom
+level.
+
+The sword starts as a small knife and gets bigger (and more effective against
+the monsters) as you pick up more sword upgrades
+
+![sword](public/819b253b0c1eeff93ffefa8becbe9bf68579e035.png)
+
+This addition really blew the byte count out - I didn't make a note, but it was
+around 1200 bytes
+
+From here, I won't show any more screenshots, but to get it under, I basically:
+
+- removed the floor sprite
+- changed it so that swords and potions just shared the same "item" sprite
+  and you didn't know what it was until you picked it up - yuck
+- removed all the colours except walls and player/monster health
+
+I was *not* happy with this version, so I golfed as hard as I could in order to:
+
+- have separate potion/sword sprites again
+- have the exit have its own sprite
+- add some colour back in
+
+I golfed so well, that in the end I was able to also add:
+
+- monsters drop a potion instead of a sword if your sword is already at max
+- an extra monster sprite
+
+...and that's where I'm calling it a day!
 
 ## License
 
