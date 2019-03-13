@@ -54,7 +54,15 @@ let s = () => {
           7
         )
 
-        c.fillStyle = '#' + 37 + 'fd9640'[ level ]
+        c.fillStyle = (
+          mapData[
+            ( viewX - 4 + mobs[ 0 ][ 0 ] )
+            + 'fd9640' +
+            ( viewY - 4 + mobs[ 0 ][ 1 ] )
+          ] ?
+          '#' + 964 :
+          '#' + 37 + 'fd9640'[ level ]
+        )
 
         for ( let i = 0; i < mobs.length; i++ ) {
           if (
