@@ -22,57 +22,60 @@ let s = () => {
   let swordSprite = 5
   let swordAmount = 1
 
-  let key = ( x, y ) => x + 'fd9' + y
-
   let level = 0
   //let level = 5
   let mapData: any
   let mobs: number[][]
 
   let draw = () => {
+    // start draw
+
     a.width = a.height = VIEWSIZE * 7 * TILESIZE
     for ( let viewY = 0; viewY < VIEWSIZE; viewY++ ) {
       for ( let viewX = 0; viewX < VIEWSIZE; viewX++ ) {
-        let mapY = viewY - 4 + mobs[ 0 ][ 1 ]
         let spriteIndex = 7
         let color: string | number = 37 + 'fd9640'[ level ]
 
         if (
           mapData[
-            key(
-              viewX - 4 + mobs[ 0 ][ 0 ],
-              mapY
-            )
+
+              ( viewX - 4 + mobs[ 0 ][ 0 ] )
+              + 'fd9640' +
+              ( viewY - 4 + mobs[ 0 ][ 1 ] )
+
           ] == floor
         ){
           spriteIndex = floorSprite
         }
         else if (
           mapData[
-            key(
-              viewX - 4 + mobs[ 0 ][ 0 ],
-              mapY
-            )
+
+              ( viewX - 4 + mobs[ 0 ][ 0 ] )
+              + 'fd9640' +
+              ( viewY - 4 + mobs[ 0 ][ 1 ] )
+
           ] == potion
         ) {
           spriteIndex = potionSprite
         }
         else if (
           mapData[
-            key(
-              viewX - 4 + mobs[ 0 ][ 0 ],
-              mapY
-            )
+
+              ( viewX - 4 + mobs[ 0 ][ 0 ] )
+              + 'fd9640' +
+              ( viewY - 4 + mobs[ 0 ][ 1 ] )
+
           ] == sword
         ) {
           spriteIndex = swordSprite
         }
         else if (
           mapData[
-            key(
-              viewX - 4 + mobs[ 0 ][ 0 ],
-              mapY
-            )
+
+              ( viewX - 4 + mobs[ 0 ][ 0 ] )
+              + 'fd9640' +
+              ( viewY - 4 + mobs[ 0 ][ 1 ] )
+
           ] == stairs
         ){
           spriteIndex = level < 5 ? stairsSprite : playerSprite
@@ -84,7 +87,7 @@ let s = () => {
             &&
             mobs[ i ][ 0 ] == viewX - 4 + mobs[ 0 ][ 0 ]
             &&
-            mobs[ i ][ 1 ] == mapY
+            mobs[ i ][ 1 ] == viewY - 4 + mobs[ 0 ][ 1 ]
           ) {
             spriteIndex = mobs[ i ][ 3 ]
             color = 'fd9640'[ mobs[ i ][ 2 ] ] + 37
@@ -113,10 +116,11 @@ let s = () => {
               )
               ||
               !mapData[
-                key(
-                  viewX - 4 + mobs[ 0 ][ 0 ],
-                  mapY
-                )
+
+                  ( viewX - 4 + mobs[ 0 ][ 0 ] )
+                  + 'fd9640' +
+                  ( viewY - 4 + mobs[ 0 ][ 1 ] )
+
               ]
             ) {
               c.fillRect(
@@ -128,16 +132,19 @@ let s = () => {
         }
       }
     }
+
+    // end draw
   }
 
   let createMap = ( health: number ) => {
     mapData = {}
     mobs = [ [ 0, 0, health, 0 ] ]
     mobs[
-      key(
-        0,
-        0
-      )
+
+        ( 0 )
+        + 'fd9640' +
+        ( 0 )
+
     ] = mobs[ 0 ]
 
     let current = [ 0, 0 ]
@@ -146,10 +153,11 @@ let s = () => {
 
     for ( let i = 0; i < ( size * ( level + 1 ) ); i++ ){
       mapData[
-        key(
-          current[ 0 ],
-          current[ 1 ]
-        )
+
+          ( current[ 0 ] )
+          + 'fd9640' +
+          ( current[ 1 ] )
+
       ] = floor + ~~( Math.random() * 2 )
 
       if (
@@ -157,10 +165,11 @@ let s = () => {
         !~~( Math.random() * ( size * ( level + 1 ) ) / ( level + 7 ) )
       ) {
         mapData[
-          key(
-            current[ 0 ],
-            current[ 1 ]
-          )
+
+            ( current[ 0 ] )
+            + 'fd9640' +
+            ( current[ 1 ] )
+
         ] = potion
       }
       else if (
@@ -169,17 +178,19 @@ let s = () => {
         !~~( Math.random() * ( size * ( level + 1 ) ) / ( level + 7 ) )
         &&
         !mobs[
-          key(
-            current[ 0 ],
-            current[ 1 ]
-          )
+
+            ( current[ 0 ] )
+            + 'fd9640' +
+            ( current[ 1 ] )
+
         ]
       ) {
         mobs[
-          key(
-            current[ 0 ],
-            current[ 1 ]
-          )
+
+            ( current[ 0 ] )
+            + 'fd9640' +
+            ( current[ 1 ] )
+
         ] = mobs[ mobs.length ] = [
           current[ 0 ],
           current[ 1 ],
@@ -199,17 +210,18 @@ let s = () => {
     }
 
     mapData[
-      key(
-        current[ 0 ],
-        current[ 1 ]
-      )
+
+        ( current[ 0 ] )
+        + 'fd9640' +
+        ( current[ 1 ] )
+
     ] = stairs
   }
 
   createMap( 5 )
   draw()
 
-  const move = ( i: number, which: number ) => {
+  let move = ( i: number, which: number ) => {
     let x = which == 37 ? -1 : which == 39 ? 1 : 0
     let y = which == 38 ? -1 : which == 40 ? 1 : 0
 
@@ -218,46 +230,51 @@ let s = () => {
       // dest is floor
       (
         mapData[
-          key(
-            mobs[ i ][ 0 ] + x,
-            mobs[ i ][ 1 ] + y
-          )
+
+            ( mobs[ i ][ 0 ] + x )
+            + 'fd9640' +
+            ( mobs[ i ][ 1 ] + y )
+
         ] < 5
       )
       &&
       // no other mob
       !mobs[
-        key(
-          mobs[ i ][ 0 ] + x,
-          mobs[ i ][ 1 ] + y
-        )
+
+          ( mobs[ i ][ 0 ] + x )
+          + 'fd9640' +
+          ( mobs[ i ][ 1 ] + y )
+
       ]
     ) {
       mobs[
-        key(
-          mobs[ i ][ 0 ],
-          mobs[ i ][ 1 ]
-        )
+
+          ( mobs[ i ][ 0 ] )
+          + 'fd9640' +
+          ( mobs[ i ][ 1 ] )
+
       ] = 0
 
       mobs[ i ][ 0 ] = mobs[ i ][ 0 ] + x
       mobs[ i ][ 1 ] = mobs[ i ][ 1 ] + y
 
       mobs[
-        key(
-          mobs[ i ][ 0 ],
-          mobs[ i ][ 1 ]
-        )
+
+          ( mobs[ i ][ 0 ] )
+          + 'fd9640' +
+          ( mobs[ i ][ 1 ] )
+
       ] = mobs[ i ]
     }
     // dest is another mob, attack
     else if(
       // dest is another mob
       mobs[
-        key(
-          mobs[ i ][ 0 ] + x,
-          mobs[ i ][ 1 ] + y
-        )
+
+          ( mobs[ i ][ 0 ] + x )
+          + 'fd9640' +
+          ( mobs[ i ][ 1 ] + y )
+
       ]
     ) {
       // monster attacks player
@@ -267,10 +284,11 @@ let s = () => {
         &&
         // target is player
         !mobs[
-          key(
-            mobs[ i ][ 0 ] + x,
-            mobs[ i ][ 1 ] + y
-          )
+
+            ( mobs[ i ][ 0 ] + x )
+            + 'fd9640' +
+            ( mobs[ i ][ 1 ] + y )
+
         ][ 3 ]
         &&
         // 50% chance to hit
@@ -278,19 +296,21 @@ let s = () => {
       ){
         // decrement player health
         mobs[
-          key(
-            mobs[ i ][ 0 ] + x,
-            mobs[ i ][ 1 ] + y
-          )
+
+            ( mobs[ i ][ 0 ] + x )
+            + 'fd9640' +
+            ( mobs[ i ][ 1 ] + y )
+
         ][ 2 ]--
 
         // if player dead, restart
         if (
           !mobs[
-            key(
-              mobs[ i ][ 0 ] + x,
-              mobs[ i ][ 1 ] + y
-            )
+
+              ( mobs[ i ][ 0 ] + x )
+              + 'fd9640' +
+              ( mobs[ i ][ 1 ] + y )
+
           ][ 2 ]
         ) {
           level = 0
@@ -305,17 +325,19 @@ let s = () => {
         &&
         // mob is not already dead
         mobs[
-          key(
-            mobs[ i ][ 0 ] + x,
-            mobs[ i ][ 1 ] + y
-          )
+
+            ( mobs[ i ][ 0 ] + x )
+            + 'fd9640' +
+            ( mobs[ i ][ 1 ] + y )
+
         ]
         &&
         mobs[
-          key(
-            mobs[ i ][ 0 ] + x,
-            mobs[ i ][ 1 ] + y
-          )
+
+            ( mobs[ i ][ 0 ] + x )
+            + 'fd9640' +
+            ( mobs[ i ][ 1 ] + y )
+
         ][ 2 ]
       ){
         //decrement health
@@ -324,17 +346,19 @@ let s = () => {
         for( let j = 0; j < damage; j++ ){
           if (
             mobs[
-              key(
-                mobs[ i ][ 0 ] + x,
-                mobs[ i ][ 1 ] + y
-              )
+
+                ( mobs[ i ][ 0 ] + x )
+                + 'fd9640' +
+                ( mobs[ i ][ 1 ] + y )
+
             ][ 2 ]
           ){
             mobs[
-              key(
-                mobs[ i ][ 0 ] + x,
-                mobs[ i ][ 1 ] + y
-              )
+
+                ( mobs[ i ][ 0 ] + x )
+                + 'fd9640' +
+                ( mobs[ i ][ 1 ] + y )
+
             ][ 2 ]--
           }
         }
@@ -342,27 +366,30 @@ let s = () => {
         // if dead remove
         if (
           !mobs[
-            key(
-              mobs[ i ][ 0 ] + x,
-              mobs[ i ][ 1 ] + y
-            )
+
+              ( mobs[ i ][ 0 ] + x )
+              + 'fd9640' +
+              ( mobs[ i ][ 1 ] + y )
+
           ][ 2 ]
         ){
           mobs[
-            key(
-              mobs[ i ][ 0 ] + x,
-              mobs[ i ][ 1 ] + y
-            )
+
+              ( mobs[ i ][ 0 ] + x )
+              + 'fd9640' +
+              ( mobs[ i ][ 1 ] + y )
+
           ] = 0
 
           if (
             !~~( Math.random() * 5 )
           ) {
             mapData[
-              key(
-                mobs[ i ][ 0 ] + x,
-                mobs[ i ][ 1 ] + y
-              )
+
+                ( mobs[ i ][ 0 ] + x )
+                + 'fd9640' +
+                ( mobs[ i ][ 1 ] + y )
+
             ] = sword
           }
         }
@@ -375,18 +402,20 @@ let s = () => {
       &&
       // is potion
       mapData[
-        key(
-          mobs[ i ][ 0 ] + x,
-          mobs[ i ][ 1 ] + y
-        )
+
+          ( mobs[ i ][ 0 ] + x )
+          + 'fd9640' +
+          ( mobs[ i ][ 1 ] + y )
+
       ] == potion
     ){
       // remove the potion
       mapData[
-        key(
-          mobs[ i ][ 0 ] + x,
-          mobs[ i ][ 1 ] + y
-        )
+
+          ( mobs[ i ][ 0 ] + x )
+          + 'fd9640' +
+          ( mobs[ i ][ 1 ] + y )
+
       ] = floor
 
       // if player health not already max increment
@@ -399,18 +428,20 @@ let s = () => {
       &&
       // is sword
       mapData[
-        key(
-          mobs[ i ][ 0 ] + x,
-          mobs[ i ][ 1 ] + y
-        )
+
+          ( mobs[ i ][ 0 ] + x )
+          + 'fd9640' +
+          ( mobs[ i ][ 1 ] + y )
+
       ] == sword
     ) {
       // remove the sword
       mapData[
-        key(
-          mobs[ i ][ 0 ] + x,
-          mobs[ i ][ 1 ] + y
-        )
+
+          ( mobs[ i ][ 0 ] + x )
+          + 'fd9640' +
+          ( mobs[ i ][ 1 ] + y )
+
       ] = floor
 
       // if sword amount not max increment
@@ -424,10 +455,11 @@ let s = () => {
       &&
       // is stairs
       mapData[
-        key(
-          mobs[ i ][ 0 ] + x,
-          mobs[ i ][ 1 ] + y
-        )
+
+          ( mobs[ i ][ 0 ] + x )
+          + 'fd9640' +
+          ( mobs[ i ][ 1 ] + y )
+
       ] == stairs
     ) {
       level++
