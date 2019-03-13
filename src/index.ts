@@ -32,35 +32,27 @@ let s = () => {
     a.width = VIEWSIZE * 7 * TILESIZE
     for ( let viewY = 0; viewY < VIEWSIZE; viewY++ ) {
       for ( let viewX = 0; viewX < VIEWSIZE; viewX++ ) {
-        let spriteIndex = 7
-
-        if (
+        let spriteIndex = (
           mapData[
               ( viewX - 4 + mobs[ 0 ][ 0 ] )
               + 'fd9640' +
               ( viewY - 4 + mobs[ 0 ][ 1 ] )
-          ] == potion
-        ) {
-          spriteIndex = potionSprite
-        }
-        else if (
+          ] == potion ?
+          potionSprite :
           mapData[
               ( viewX - 4 + mobs[ 0 ][ 0 ] )
               + 'fd9640' +
               ( viewY - 4 + mobs[ 0 ][ 1 ] )
-          ] == sword
-        ) {
-          spriteIndex = swordSprite
-        }
-        else if (
+          ] == sword ?
+          swordSprite :
           mapData[
               ( viewX - 4 + mobs[ 0 ][ 0 ] )
               + 'fd9640' +
               ( viewY - 4 + mobs[ 0 ][ 1 ] )
-          ] == stairs
-        ){
-          spriteIndex = level < 5 ? stairsSprite : exitSprite
-        }
+          ] == stairs ?
+          level < 5 ? stairsSprite : exitSprite :
+          7
+        )
 
         c.fillStyle = '#' + 37 + 'fd9640'[ level ]
 

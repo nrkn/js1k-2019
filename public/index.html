@@ -153,40 +153,20 @@ let s = () => {
         a.width = VIEWSIZE * 7 * TILESIZE;
         for (let viewY = 0; viewY < VIEWSIZE; viewY++) {
             for (let viewX = 0; viewX < VIEWSIZE; viewX++) {
-                let spriteIndex = 7;
-                if (mapData[(viewX - 4 + mobs[0][0])
+                let spriteIndex = (mapData[(viewX - 4 + mobs[0][0])
                     + 'fd9640' +
-                    (viewY - 4 + mobs[0][1])] == potion) {
-                    spriteIndex = potionSprite;
-                }
-                else if (mapData[(viewX - 4 + mobs[0][0])
-                    + 'fd9640' +
-                    (viewY - 4 + mobs[0][1])] == sword) {
-                    spriteIndex = swordSprite;
-                }
-                else if (mapData[(viewX - 4 + mobs[0][0])
-                    + 'fd9640' +
-                    (viewY - 4 + mobs[0][1])] == stairs) {
-                    spriteIndex = level < 5 ? stairsSprite : exitSprite;
-                }
-                if (mapData[(viewX - 4 + mobs[0][0])
-                    + 'fd9640' +
-                    (viewY - 4 + mobs[0][1])] == potion) {
-                    c.fillStyle = '#' + 964;
-                }
-                else if (mapData[(viewX - 4 + mobs[0][0])
-                    + 'fd9640' +
-                    (viewY - 4 + mobs[0][1])] == sword) {
-                    c.fillStyle = '#' + 999;
-                }
-                else if (mapData[(viewX - 4 + mobs[0][0])
-                    + 'fd9640' +
-                    (viewY - 4 + mobs[0][1])] == stairs) {
-                    c.fillStyle = '#' + 37 + 'fd9640'[level];
-                }
-                else {
-                    c.fillStyle = '#' + 37 + 'fd9640'[level];
-                }
+                    (viewY - 4 + mobs[0][1])] == potion ?
+                    potionSprite :
+                    mapData[(viewX - 4 + mobs[0][0])
+                        + 'fd9640' +
+                        (viewY - 4 + mobs[0][1])] == sword ?
+                        swordSprite :
+                        mapData[(viewX - 4 + mobs[0][0])
+                            + 'fd9640' +
+                            (viewY - 4 + mobs[0][1])] == stairs ?
+                            level < 5 ? stairsSprite : exitSprite :
+                            7);
+                c.fillStyle = '#' + 37 + 'fd9640'[level];
                 for (let i = 0; i < mobs.length; i++) {
                     if (mobs[i][2]
                         &&
