@@ -3,7 +3,7 @@
 A [Roguelike](https://en.wikipedia.org/wiki/Roguelike) in 1kb of JavaScript,
 for [JS1k 2019](https://js1k.com/2019-x)
 
-[Play it here](https://js1k.com/NNNN)
+[Play it here](https://js1k.com/2019-x/demo/4134)
 
 ![X-RL](public/current.png)
 
