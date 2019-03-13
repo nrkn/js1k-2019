@@ -4,7 +4,7 @@ declare const c: CanvasRenderingContext2D
 declare const d: Document
 
 let s = () => {
-  let sprites = 'a~j~a@mq`j`jassm^@a@plkjj@{{{{q{'
+  let sprites = 'a~j~a@mq`j`jassm^@a@plkjj@{{{{q{@bTHTb'
 
   let VIEWSIZE = 9
   let TILESIZE = 5
@@ -18,6 +18,7 @@ let s = () => {
   let potionSprite = 2
   let stairsSprite = 3
   let swordSprite = 4
+  let exitSprite = 5
   let swordAmount = 1
 
   let level = 0
@@ -58,7 +59,7 @@ let s = () => {
               ( viewY - 4 + mobs[ 0 ][ 1 ] )
           ] == stairs
         ){
-          spriteIndex = level < 5 ? stairsSprite : playerSprite
+          spriteIndex = level < 5 ? stairsSprite : exitSprite
         }
 
         c.fillStyle = '#' + 37 + 'fd9640'[ level ]

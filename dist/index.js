@@ -1,6 +1,6 @@
 "use strict";
 let s = () => {
-    let sprites = 'a~j~a@mq`j`jassm^@a@plkjj@{{{{q{';
+    let sprites = 'a~j~a@mq`j`jassm^@a@plkjj@{{{{q{@bTHTb';
     let VIEWSIZE = 9;
     let TILESIZE = 5;
     let floor = 3;
@@ -12,6 +12,7 @@ let s = () => {
     let potionSprite = 2;
     let stairsSprite = 3;
     let swordSprite = 4;
+    let exitSprite = 5;
     let swordAmount = 1;
     let level = 0;
     //let level = 5
@@ -36,9 +37,26 @@ let s = () => {
                 else if (mapData[(viewX - 4 + mobs[0][0])
                     + 'fd9640' +
                     (viewY - 4 + mobs[0][1])] == stairs) {
-                    spriteIndex = level < 5 ? stairsSprite : playerSprite;
+                    spriteIndex = level < 5 ? stairsSprite : exitSprite;
                 }
-                c.fillStyle = '#' + 37 + 'fd9640'[level];
+                if (mapData[(viewX - 4 + mobs[0][0])
+                    + 'fd9640' +
+                    (viewY - 4 + mobs[0][1])] == potion) {
+                    c.fillStyle = '#' + 964;
+                }
+                else if (mapData[(viewX - 4 + mobs[0][0])
+                    + 'fd9640' +
+                    (viewY - 4 + mobs[0][1])] == sword) {
+                    c.fillStyle = '#' + 999;
+                }
+                else if (mapData[(viewX - 4 + mobs[0][0])
+                    + 'fd9640' +
+                    (viewY - 4 + mobs[0][1])] == stairs) {
+                    c.fillStyle = '#' + 37 + 'fd9640'[level];
+                }
+                else {
+                    c.fillStyle = '#' + 37 + 'fd9640'[level];
+                }
                 for (let i = 0; i < mobs.length; i++) {
                     if (mobs[i][2]
                         &&
