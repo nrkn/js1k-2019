@@ -32,7 +32,6 @@ let s = () => {
     for ( let viewY = 0; viewY < VIEWSIZE; viewY++ ) {
       for ( let viewX = 0; viewX < VIEWSIZE; viewX++ ) {
         let spriteIndex = 7
-        let color: string | number = 37 + 'fd9640'[ level ]
 
         if (
           mapData[
@@ -62,6 +61,8 @@ let s = () => {
           spriteIndex = level < 5 ? stairsSprite : playerSprite
         }
 
+        c.fillStyle = '#' + 37 + 'fd9640'[ level ]
+
         for ( let i = 0; i < mobs.length; i++ ) {
           if (
             mobs[ i ][ 2 ]
@@ -71,11 +72,9 @@ let s = () => {
             mobs[ i ][ 1 ] == viewY - 4 + mobs[ 0 ][ 1 ]
           ) {
             spriteIndex = mobs[ i ][ 3 ]
-            color = 'fd9640'[ mobs[ i ][ 2 ] ] + 37
+            c.fillStyle = '#' + 'fd9640'[ mobs[ i ][ 2 ] ] + 37
           }
         }
-
-        c.fillStyle = '#' + color
 
         for ( let spriteY = 0; spriteY < 7; spriteY++ ) {
           for ( let spriteX = 0; spriteX < 7; spriteX++ ) {
