@@ -199,6 +199,7 @@ let s = () => {
 
   b.onkeydown = e => {
     for ( let i = 0; i < mobs.length; i++ ) {
+      let damage = ~~( Math.random() * swordAmount ) + 1
       let action = ~~( Math.random() * 4 )
       let which: number
 
@@ -312,32 +313,40 @@ let s = () => {
             ][ 2 ]
           ) {
             //decrement health
-            let damage = ~~( Math.random() * swordAmount ) + 1
-
-            for ( let j = 0; j < damage; j++ ) {
-              if (
-                mobs[
-                ( mobs[ i ][ 0 ] + x )
-                + 'fd9640' +
-                ( mobs[ i ][ 1 ] + y )
-                ][ 2 ]
-              ) {
-                mobs[
-                  ( mobs[ i ][ 0 ] + x )
-                  + 'fd9640' +
-                  ( mobs[ i ][ 1 ] + y )
-                ][ 2 ]--
-              }
-            }
-
-            // if dead remove
             if (
-              !mobs[
+              mobs[
               ( mobs[ i ][ 0 ] + x )
               + 'fd9640' +
               ( mobs[ i ][ 1 ] + y )
               ][ 2 ]
             ) {
+              mobs[
+                ( mobs[ i ][ 0 ] + x )
+                + 'fd9640' +
+                ( mobs[ i ][ 1 ] + y )
+              ][ 2 ]
+              =
+              mobs[
+                ( mobs[ i ][ 0 ] + x )
+                + 'fd9640' +
+                ( mobs[ i ][ 1 ] + y )
+              ][ 2 ] - damage
+            }
+
+            // if dead remove
+            if (
+              mobs[
+                ( mobs[ i ][ 0 ] + x )
+                + 'fd9640' +
+                ( mobs[ i ][ 1 ] + y )
+              ][ 2 ] <= 0
+            ) {
+              mobs[
+                ( mobs[ i ][ 0 ] + x )
+                + 'fd9640' +
+                ( mobs[ i ][ 1 ] + y )
+              ][ 2 ] = 0
+
               mobs[
                 ( mobs[ i ][ 0 ] + x )
                 + 'fd9640' +
