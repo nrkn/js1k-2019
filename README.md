@@ -76,8 +76,8 @@ adapted from those.
 
 ### [b8c0284f6a8e91c3b82c8453e08fdb05d6a80b31](https://github.com/nrkn/js1k-2019/tree/b8c0284f6a8e91c3b82c8453e08fdb05d6a80b31)
 
-OK - after crunching some numbers I realised that Ranger Down was too ambitious
-- there was no way I was going to get something even resembling it done in 1k.
+OK - after crunching some numbers I realised that Ranger Down was too ambitious.
+There was no way I was going to get something even resembling it done in 1k.
 I decided to fall back to a Roguelike, I've done plenty of those before. I
 generated some rectangular rooms and used a graph to connect them together with
 corridors:
