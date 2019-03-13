@@ -1,17 +1,20 @@
 "use strict";
 let s = () => {
-    let sprites = '^AUA^R@N_U_U@@@@@@U@^LLRa^OSTUU';
+    let sprites = '^AUA^R@N_U_U@@@@@@U@^LLRa^OSTUUDDDDND@';
     let xor = 64;
     let VIEWSIZE = 9;
     let TILESIZE = 5;
     let floor = 3;
     let potion = 5;
     let stairs = 6;
+    let sword = 7;
     let playerSprite = 0;
     let monsterSprite = 1;
     let floorSprite = 2;
     let potionSprite = 3;
     let stairsSprite = 4;
+    let swordSprite = 5;
+    let swordAmount = 1;
     let key = (x, y) => x + 'fd9' + y;
     let level = 0;
     //let level = 5
@@ -32,6 +35,10 @@ let s = () => {
                     spriteIndex = potionSprite;
                     color = 640;
                 }
+                else if (mapData[key(viewX - 4 + mobs[0][0], mapY)] == sword) {
+                    spriteIndex = swordSprite;
+                    color = 640;
+                }
                 else if (mapData[key(viewX - 4 + mobs[0][0], mapY)] == stairs) {
                     spriteIndex = level < 5 ? stairsSprite : playerSprite;
                 }
@@ -48,9 +55,17 @@ let s = () => {
                 c.fillStyle = '#' + color;
                 for (let spriteY = 0; spriteY < 7; spriteY++) {
                     for (let spriteX = 0; spriteX < 7; spriteX++) {
-                        if ((spriteIndex < 7
+                        if ((spriteIndex == playerSprite
                             &&
-                                (xor ^ sprites.charCodeAt(spriteIndex * 7 + spriteY)) >> spriteX & 1)
+                                spriteX == 6
+                            &&
+                                spriteY < 6
+                            &&
+                                spriteY > 4 - swordAmount)
+                            ||
+                                (spriteIndex < 7
+                                    &&
+                                        (xor ^ sprites.charCodeAt(spriteIndex * 7 + spriteY)) >> spriteX & 1)
                             ||
                                 !mapData[key(viewX - 4 + mobs[0][0], mapY)]) {
                             c.fillRect(spriteX * TILESIZE + viewX * 7 * TILESIZE, spriteY * TILESIZE + viewY * 7 * TILESIZE, TILESIZE, TILESIZE);
@@ -60,9 +75,9 @@ let s = () => {
             }
         }
     };
-    let createMap = () => {
+    let createMap = (health) => {
         mapData = {};
-        mobs = [[0, 0, 5, 0]];
+        mobs = [[0, 0, health, 0]];
         mobs[key(0, 0)] = mobs[0];
         let current = [0, 0];
         let size = 96;
@@ -95,7 +110,7 @@ let s = () => {
         }
         mapData[key(current[0], current[1])] = stairs;
     };
-    createMap();
+    createMap(5);
     draw();
     const move = (i, which) => {
         let x = which == 37 ? -1 : which == 39 ? 1 : 0;
@@ -131,7 +146,8 @@ let s = () => {
                 // if player dead, restart
                 if (!mobs[key(mobs[i][0] + x, mobs[i][1] + y)][2]) {
                     level = 0;
-                    createMap();
+                    swordAmount = 1;
+                    createMap(5);
                 }
             }
             // player attacks mob
@@ -144,10 +160,18 @@ let s = () => {
                 &&
                     mobs[key(mobs[i][0] + x, mobs[i][1] + y)][2]) {
                 //decrement health
-                mobs[key(mobs[i][0] + x, mobs[i][1] + y)][2]--;
+                let damage = ~~(Math.random() * swordAmount) + 1;
+                for (let j = 0; j < damage; j++) {
+                    if (mobs[key(mobs[i][0] + x, mobs[i][1] + y)][2]) {
+                        mobs[key(mobs[i][0] + x, mobs[i][1] + y)][2]--;
+                    }
+                }
                 // if dead remove
                 if (!mobs[key(mobs[i][0] + x, mobs[i][1] + y)][2]) {
                     mobs[key(mobs[i][0] + x, mobs[i][1] + y)] = 0;
+                    if (!~~(Math.random() * 5)) {
+                        mapData[key(mobs[i][0] + x, mobs[i][1] + y)] = sword;
+                    }
                 }
             }
         }
@@ -164,6 +188,18 @@ let s = () => {
             if (mobs[i][2] < 5)
                 mobs[i][2]++;
         }
+        else if (
+        // current mob is player
+        !i
+            &&
+                // is potion
+                mapData[key(mobs[i][0] + x, mobs[i][1] + y)] == sword) {
+            // remove the potion
+            mapData[key(mobs[i][0] + x, mobs[i][1] + y)] = floor;
+            // if sword amount not max increment
+            if (swordAmount < 5)
+                swordAmount++;
+        }
         // dest is stairs, go down
         else if (
         // current mob is player
@@ -172,7 +208,7 @@ let s = () => {
                 // is stairs
                 mapData[key(mobs[i][0] + x, mobs[i][1] + y)] == stairs) {
             level++;
-            createMap();
+            createMap(mobs[i][2]);
         }
     };
     b.onkeydown = e => {
