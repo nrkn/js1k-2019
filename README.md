@@ -47,6 +47,15 @@ Arrow keys to move, bump to use/attack/get
   directly queried for data
 - Inlining to a ludicrous degree at the expense of readability
 
+## Sprite Encoder Tool
+
+Takes a sprite sheet saved as PNG, and spits out a packed string
+
+![encoder](public/sprite-encoder.png)
+
+If you're interested in the code, let me know and I'll tidy it up and release
+it on GitHub
+
 ## A Visual Development History
 
 NB, this only shows some interesting milestones, there are a lot more
