@@ -169,6 +169,9 @@ many bytes and came up with this:
 Some text or something saying "you win!" would have been nice, but wayyy too
 many bytes!
 
+The floor sprite was again simplified - it reuses a row from the ghost sprite,
+so that the 7 bytes from that row can be compressed by the packer.
+
 ### [819b253b0c1eeff93ffefa8becbe9bf68579e035](https://github.com/nrkn/js1k-2019/tree/819b253b0c1eeff93ffefa8becbe9bf68579e035)
 
 The final thing I wanted was for the player to be able to have a weapon, and
@@ -177,32 +180,41 @@ to fight them, rather than just trying to avoid them and get to the bottom
 level.
 
 The sword starts as a small knife and gets bigger (and more effective against
-the monsters) as you pick up more sword upgrades
+the monsters) as you pick up more sword upgrades. It's drawn dynamically because
+having five different sprites for the sword and adding code to overlay that over
+the player sprite would have been really expensive.
 
 ![sword](public/819b253b0c1eeff93ffefa8becbe9bf68579e035.png)
 
 This addition really blew the byte count out - I didn't make a note, but it was
-around 1200 bytes
+at least 1200 bytes now. However, it made the game so much better that I really
+wanted to keep it.
 
-From here, I won't show any more screenshots, but to get it under, I basically:
+To get it under, I basically:
 
-- removed the floor sprite
+- removed the floor sprite entirely - it wasn't just the 7 bytes for the sprite,
+  but also the logic in the map generator to make two different floor types,
+  and all the collision logic had to know that both floor types were walkable
 - changed it so that swords and potions just shared the same "item" sprite
-  and you didn't know what it was until you picked it up - yuck
-- removed all the colours except walls and player/monster health
+  and you didn't know what it was until you picked it up - yuck - this was
+  disgusting but I was struggling to get the bytes down
+- removed all the colours except walls and player/monster health - this removed
+  a lot of visual interest but saved a lot of bytes
 
 I was *not* happy with this version, so I golfed as hard as I could in order to:
 
 - have separate potion/sword sprites again
-- have the exit have its own sprite
 - add some colour back in
 
 I golfed so well, that in the end I was able to also add:
 
-- monsters drop a potion instead of a sword if your sword is already at max
-- an extra monster sprite
-
-...and that's where I'm calling it a day!
+- have the exit have its own sprite instead of a statue that looked like the
+  player, I wanted to a) have a nod to this year's theme and b) have something
+  distinct that wouldn't confuse people
+- monsters drop a potion instead of a sword if your sword is already at max, it
+  was bothering me getting sword upgrades that I didn't need
+- an extra monster sprite! this actually only ended up being a handful of bytes
+  and if I had more room I would add another one or two.
 
 ## License
 
