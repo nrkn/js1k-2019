@@ -4,7 +4,7 @@ declare const c: CanvasRenderingContext2D
 declare const d: Document
 
 // closure so that uglify won't treat any variables as local
-let s = () => {
+(() => {
   /*
     6x7 1-bit sprites packed into chars - drawn as 7x7 to have square tiles
 
@@ -300,8 +300,6 @@ let s = () => {
   b.onkeydown = e => {
     // iterate over all mobs including player
     for ( let i = 0; i < mobs.length; i++ ) {
-      // the damage the players sword will do this turn if it hits a monster
-      let damage = ~~( Math.random() * swordAmount ) + 1
       // a random action for monsters to take
       let action = ~~( Math.random() * 4 )
       // will hold a code to determine movement
@@ -439,7 +437,7 @@ let s = () => {
               ( mobs[ i ][ 1 ] + y )
               ][ 2 ]
             ) {
-              //decrement monster health according to damage determined earlier
+              //decrement monster health
               mobs[
                 ( mobs[ i ][ 0 ] + x )
                 + 'fd9640' +
@@ -450,7 +448,7 @@ let s = () => {
                 ( mobs[ i ][ 0 ] + x )
                 + 'fd9640' +
                 ( mobs[ i ][ 1 ] + y )
-              ][ 2 ] - damage
+              ][ 2 ] - ( ~~( Math.random() * swordAmount ) + 1 )
             }
 
             if (
@@ -564,6 +562,4 @@ let s = () => {
   // first run, set the player's initial health and draw
   createMap( 5 )
   draw()
-}
-
-s()
+})()
