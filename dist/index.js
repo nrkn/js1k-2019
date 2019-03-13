@@ -76,13 +76,13 @@ let s = () => {
         // end draw
     };
     let createMap = (health) => {
+        let current = [0, 0];
+        let size = 96;
         mapData = {};
         mobs = [[0, 0, health, 0]];
         mobs[(0)
             + 'fd9640' +
             (0)] = mobs[0];
-        let current = [0, 0];
-        let size = 96;
         //let size = 10
         for (let i = 0; i < (size * (level + 1)); i++) {
             mapData[(current[0])
@@ -122,8 +122,6 @@ let s = () => {
             + 'fd9640' +
             (current[1])] = stairs;
     };
-    createMap(5);
-    draw();
     let move = (i, which) => {
         let x = which == 37 ? -1 : which == 39 ? 1 : 0;
         let y = which == 38 ? -1 : which == 40 ? 1 : 0;
@@ -281,6 +279,8 @@ let s = () => {
         }
         draw();
     };
+    createMap(5);
+    draw();
 };
 s();
 //# sourceMappingURL=index.js.map

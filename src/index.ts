@@ -100,7 +100,7 @@ let s = () => {
                 )
               )
               ||
-              !mapata[
+              !mapData[
                   ( viewX - 4 + mobs[ 0 ][ 0 ] )
                   + 'fd9640' +
                 ( viewY - 4 + mobs[ 0 ][ 1 ] )
@@ -120,6 +120,9 @@ let s = () => {
   }
 
   let createMap = ( health: number ) => {
+    let current = [ 0, 0 ]
+    let size = 96
+
     mapData = {}
     mobs = [ [ 0, 0, health, 0 ] ]
     mobs[
@@ -128,8 +131,6 @@ let s = () => {
         ( 0 )
     ] = mobs[ 0 ]
 
-    let current = [ 0, 0 ]
-    let size = 96
     //let size = 10
 
     for ( let i = 0; i < ( size * ( level + 1 ) ); i++ ){
@@ -188,9 +189,6 @@ let s = () => {
         ( current[ 1 ] )
     ] = stairs
   }
-
-  createMap( 5 )
-  draw()
 
   let move = ( i: number, which: number ) => {
     let x = which == 37 ? -1 : which == 39 ? 1 : 0
@@ -417,6 +415,9 @@ let s = () => {
 
     draw()
   }
+
+  createMap( 5 )
+  draw()
 }
 
 s()
