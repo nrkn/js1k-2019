@@ -1,6 +1,6 @@
 "use strict";
 let s = () => {
-    let sprites = 'a~j~a@mq`j`jassm^@a@plkjj@{{{{q{';
+    let sprites = 'a~j~a@mq`j`jnu{un@plkjj@';
     let VIEWSIZE = 9;
     let TILESIZE = 5;
     let floor = 3;
@@ -11,7 +11,7 @@ let s = () => {
     let monsterSprite = 1;
     let potionSprite = 2;
     let stairsSprite = 3;
-    let swordSprite = 4;
+    let swordSprite = 2;
     let swordAmount = 1;
     let level = 0;
     //let level = 5
