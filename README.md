@@ -136,7 +136,11 @@ dungeons with rectangular rooms and corridors were just too greedy.
 I ended up resorting to an old favourite technique, just randomly tunnelling
 out a cave-like area
 
-This version has potions, and most of the sprites were redrawn
+This version has potions, and most of the sprites were redrawn - the main change
+was that I removed the pixels from the right hand side of the player sprite's
+face - at this stage I was already hoping to be able to give them a sword, and
+with the limited sprite size it would have looked bad drawn right up against
+the player sprite's face
 
 ![cave](public/6bbe12d05fa2cd4854891267fdd6b3d94006d2fb.png)
 
@@ -147,8 +151,10 @@ OK, so you can fight monsters and pick up healing potions, but once you'd
 cleared the level, what more is there to do? It was time to add stairs to the
 next level.
 
-The walls are different colours on different levels, and I simplified the floor
-sprites to save a few bytes
+The level generator was modified so that bigger caves would be generated on each
+subsequent level, and the monster density would rise. The walls are different
+colours on different levels, and I simplified the floor sprites to save a few
+bytes.
 
 ![stairs](public/350736edee24bb62e4cb522478296c38871eca75.png)
 
@@ -157,7 +163,8 @@ sprites to save a few bytes
 In a simple game, there should be some way to win.
 
 When you get far enough down the dungeon, there's a statue you can get
-(I chose this so I could reuse the player sprite) that allows you to win
+(I chose to make the goal a statue so I could reuse the player sprite) that
+allows you to win.
 
 ![statue](public/ddc17cd8b705c285185320d87bd5d2e7f5c7e7fe.png)
 
@@ -166,14 +173,15 @@ many bytes and came up with this:
 
 ![win](public/ddc17cd8b705c285185320d87bd5d2e7f5c7e7fe-win.png)
 
-Some text or something saying "you win!" would have been nice, but wayyy too
-many bytes!
+Some text or something saying "you win!" would have been nice, but way too many
+bytes!
 
 What I ended up doing for the win screen was sending the player to a new level,
 just like if they went down the stairs, but having the map generator not
 generate anything for the "win" level - I expected it to just show the player in
 the center of the screen, but a by-product of the way the draw loop works means
 that the first half of the viewport is coloured differently to the last half,
+because after the player gets drawn, the fillstyle is set to the player color,
 which is actually quite a nice glitch.
 
 The floor sprite was again simplified - it reuses a row from the ghost sprite,
