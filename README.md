@@ -58,6 +58,28 @@ it on GitHub
 
 ## A Visual Development History
 
+I wanted to use sprites this time around, because in past JS1Ks I tried but
+failed to get a game that had both sprites and decent gameplay to fit into the
+1k limit, and I figured it would be a good challenge.
+
+Reviewing past JS1K entries, the evidence seems to point at the most efficent
+way of packing 1-bit sprite data into code is by storing it in a string.
+
+I went with 7x7 sprites because you can pack each row of 7 bits nicely into a
+single ASCII character. As soon as you start using all 8 they get treated as 2
+bytes due to how UTF-8 works. In reality, I actually used 6x7 sprites drawn on a
+7x7 grid, because the printable character range for 7 bits is 32-128, which only
+leaves 96 of the 128 combinations of 7 bits usable. If you want to use all 7
+bits and make sure that every 7 bit row is a printable character in that 32-128
+range, you either have to be careful how you design your sprites, or
+alternately you can search for a value that when xor'ed with means all of your
+characters after xor'ing fall in that range, and then reverse the process using
+that value when upacking. I used the second approach for quite a while but ended
+up just using 6 bits per row to save some bytes.
+
+I succeeded in making a game that not only used sprites, but actually had more
+gameplay depth than in previous attempts.
+
 NB, this only shows some interesting milestones, there are a lot more
 [commits](https://github.com/nrkn/js1k-2019/commits/master) involving all kinds
 of golfing, experimenting, abandoned features, bug fixes etc.
@@ -78,9 +100,9 @@ adapted from those.
 
 OK - after crunching some numbers I realised that Ranger Down was too ambitious.
 There was no way I was going to get something even resembling it done in 1k.
-I decided to fall back to a Roguelike, I've done plenty of those before. I
-generated some rectangular rooms and used a graph to connect them together with
-corridors:
+I decided to fall back to a Roguelike, I've done plenty of those before. I drew
+a simple little player sprite, and made a dungeon generator that generated
+rectangular rooms and used a graph to connect them together with corridors:
 
 ![dungeon](public/b8c0284f6a8e91c3b82c8453e08fdb05d6a80b31.png)
 
