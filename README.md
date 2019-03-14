@@ -247,12 +247,10 @@ What I would add if I had some more bytes (most of these aren't feasible in 1k):
 - armour - the monsters would be more powerful so that it was actually needed
 - a ranged weapon, like a bow
 - wall and floor sprites rather than solid blocks
-- add proper dungeon generator back in
-- more monsters
-- monsters have different behaviour
+- revert to a proper dungeon generator, ideally the graph-based one
+- more different monsters
+- monsters have different behaviour and power
 - more use of color
-- maybe doors?
-- treasure chests?
 - more levels - hindered by the use throughout the codebase of the string with
   five different hex values for colors
 
