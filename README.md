@@ -236,6 +236,10 @@ I golfed so well, that in the end I was able to also add:
 - an extra monster sprite! this actually only ended up being a handful of bytes
   and if I had more room I would add another one or two.
 
+I often wish there was something between JS1k and JS13k, like JS2k or JS4k,
+because by the time I've finished a 1k there are often lots of small things I'd
+like to add.
+
 What I would add if I had some more bytes (most of these aren't feasible in 1k):
 
 - monsters drop coins and there is occasionally a shop where you can spend them
