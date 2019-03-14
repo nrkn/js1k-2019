@@ -169,20 +169,28 @@ many bytes and came up with this:
 Some text or something saying "you win!" would have been nice, but wayyy too
 many bytes!
 
+What I ended up doing for the win screen was sending the player to a new level,
+just like if they went down the stairs, but having the map generator not
+generate anything for the "win" level - I expected it to just show the player in
+the center of the screen, but a by-product of the way the draw loop works means
+that the first half of the viewport is coloured differently to the last half,
+which is actually quite a nice glitch.
+
 The floor sprite was again simplified - it reuses a row from the ghost sprite,
 so that the 7 bytes from that row can be compressed by the packer.
 
 ### [819b253b0c1eeff93ffefa8becbe9bf68579e035](https://github.com/nrkn/js1k-2019/tree/819b253b0c1eeff93ffefa8becbe9bf68579e035)
 
 The final thing I wanted was for the player to be able to have a weapon, and
-for the monsters to drop sword upgrades and potions so that there is a reason
+for the monsters to sometimes drop sword upgrades so that there is a reason
 to fight them, rather than just trying to avoid them and get to the bottom
 level.
 
-The sword starts as a small knife and gets bigger (and more effective against
-the monsters) as you pick up more sword upgrades. It's drawn dynamically because
-having five different sprites for the sword and adding code to overlay that over
-the player sprite would have been really expensive.
+The sword starts small, like a knife, and gets bigger (and more effective
+against the monsters) as you pick up more sword upgrades. It's drawn dynamically
+because it would have been expensive having five different sprites for the sword
+and adding code to overlay that over the player sprite, or to have five player
+sprite variants.
 
 ![sword](public/819b253b0c1eeff93ffefa8becbe9bf68579e035.png)
 
@@ -194,7 +202,11 @@ To get it under, I basically:
 
 - removed the floor sprite entirely - it wasn't just the 7 bytes for the sprite,
   but also the logic in the map generator to make two different floor types,
-  and all the collision logic had to know that both floor types were walkable
+  and all the collision logic had to know that both floor types were walkable.
+  Additionally, the new cave generator rarely creates large open areas, so the
+  reason for decorating the floors wasn't needed anymore, which was to help you
+  stay oriented when moving around areas with no visible walls. A shame though,
+  as it did add to the overall aesthetic.
 - changed it so that swords and potions just shared the same "item" sprite
   and you didn't know what it was until you picked it up - yuck - this was
   disgusting but I was struggling to get the bytes down
@@ -215,6 +227,22 @@ I golfed so well, that in the end I was able to also add:
   was bothering me getting sword upgrades that I didn't need
 - an extra monster sprite! this actually only ended up being a handful of bytes
   and if I had more room I would add another one or two.
+
+What I would add if I had some more bytes (most of these aren't feasible in 1k):
+
+- monsters drop coins and there is occasionally a shop where you can spend them
+  to buy better weapons
+- armour - the monsters would be more powerful so that it was actually needed
+- a ranged weapon, like a bow
+- wall and floor sprites rather than solid blocks
+- add proper dungeon generator back in
+- more monsters
+- monsters have different behaviour
+- more use of color
+- maybe doors?
+- treasure chests?
+- more levels - hindered by the use throughout the codebase of the string with
+  five different hex values for colors
 
 ## License
 
