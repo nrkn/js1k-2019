@@ -18,8 +18,8 @@
   },
   "homepage": "https://github.com/nrkn/js1k-2019#readme",
   "devDependencies": {
-    "@types/jsdom": "^12.2.2",
-    "@types/node": "^11.9.5",
-    "jsdom": "^13.2.0"
+    "@types/jsdom": "^16.2.14",
+    "@types/node": "^18.0.1",
+    "jsdom": "^20.0.0"
   }
 }

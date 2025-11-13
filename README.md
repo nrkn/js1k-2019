@@ -30,13 +30,14 @@ Arrow keys to move, bump to use/attack/get
 - add one feature at a time and only golf down when we go above 1024 bytes
 - iterate, iterate, iterate! At every iteration:
   - use [uglify](https://skalman.github.io/UglifyJS-online/) for minification
-    - examine the minified code to find things that didn't minify as well as they
-      could have
+    - examine the minified code to find things that didn't minify as well as 
+      they could have
   - use [regpack](http://siorki.github.io/regPack.html) for packing
     - look at what tokens nearly had a compression gain and try to reuse them
       elsewhere
 - use GitHub, check in often
-- use [TypeScript](http://typescriptlang.org/) to help catch typos and errors in ugly, complicated code
+- use [TypeScript](http://typescriptlang.org/) to help catch typos and errors 
+  in ugly, complicated code
 
 ### Tricky/weird stuff to save bytes:
 
@@ -66,16 +67,17 @@ Reviewing past JS1K entries, the evidence seems to point at the most efficent
 way of packing 1-bit sprite data into code is by storing it in a string.
 
 I went with 7x7 sprites because you can pack each row of 7 bits nicely into a
-single ASCII character. As soon as you start using all 8 they get treated as 2
-bytes due to how UTF-8 works. In reality, I actually used 6x7 sprites drawn on a
-7x7 grid, because the printable character range for 7 bits is 32-128, which only
-leaves 96 of the 128 combinations of 7 bits usable. If you want to use all 7
-bits and make sure that every 7 bit row is a printable character in that 32-128
-range, you either have to be careful how you design your sprites, or
+single ASCII character. As soon as you start using all 8 they may get treated as 
+2 bytes due to how UTF-8 works. In reality, I actually used 6x7 sprites drawn on 
+a 7x7 grid, because the printable character range for 7 bits is 32-128, which 
+only leaves 96 of the 128 combinations of 7 bits usable. If you want to use all 
+7 bits and make sure that every 7 bit row is a printable character in that 
+32-128 range, you either have to be careful how you design your sprites, or
 alternately you can search for a value that when xor'ed with means all of your
 characters after xor'ing fall in that range, and then reverse the process using
-that value when upacking. I used the second approach for quite a while but ended
-up just using 6 bits per row to save some bytes.
+that value when upacking. I used the second approach for quite a while but in 
+the end I went with just using 6 bits per row to save the extra bytes needed
+for the decoder.
 
 I succeeded in making a game that not only used sprites, but actually had more
 gameplay depth than in previous attempts.
