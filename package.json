@@ -4,7 +4,8 @@
   "description": "JS1K 2019 Entry",
   "main": "./dist/index.js",
   "scripts": {
-    "build": "tsc && node ./dist/build"
+    "build": "tsc",
+    "start": "npm run build && npx http-server public"
   },
   "repository": {
     "type": "git",
@@ -18,8 +19,6 @@
   },
   "homepage": "https://github.com/nrkn/js1k-2019#readme",
   "devDependencies": {
-    "@types/jsdom": "^16.2.14",
-    "@types/node": "^18.0.1",
-    "jsdom": "^20.0.0"
+    "http-server": "^14.1.1"
   }
 }

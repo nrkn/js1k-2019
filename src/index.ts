@@ -1,565 +1,413 @@
-declare const a: HTMLCanvasElement
-declare const b: HTMLBodyElement
-declare const c: CanvasRenderingContext2D
-declare const d: Document
+// Un-1k-ified, readable version with behavior parity
 
-// closure so that uglify won't treat any variables as local
-(() => {
-  /*
-    6x7 1-bit sprites packed into chars - drawn as 7x7 to have square tiles
+// --- Types ---
+type PointSlug = `${number},${number}`
 
-    You can use 7x7 but for it to fit into the printable ascii range so you can
-    put it in a normal javascript string, the high bit has to be set, so if you
-    have a sprite that doesn't use the 7th column you have to find some value
-    you can xor the charcodes with so that all the rows still fit in the
-    printable ascii range (therefore 1byte per char in utf8).
+type Entity = {
+  x: number
+  y: number
+  hp: number // 0..5, 0 = dead
+  sprite: number // sprite index; 0 = player
+}
 
-    It's a clever solution but you can save the bytes you'd use doing this by
-    just making them 1 column smaller instead.
-  */
-  let sprites = 'a~j~a@mq`j`jassm^@a@plkjj@{{{{q{@bTHTbmaua@m'
+const SPRITES = [
+  [
+    0b0111100,
+    0b1000000,
+    0b1010100,
+    0b1000000,
+    0b0111100,
+    0b1111110,
+    0b0100100
+  ],
+  [
+    0b0000000,
+    0b0111000,
+    0b1111100,
+    0b1010100,
+    0b1111100,
+    0b1010100,
+    0b0000000
+  ],
+  [
+    0b0111100,
+    0b0011000,
+    0b0011000,
+    0b0100100,
+    0b1000010,
+    0b1111110,
+    0b0111100
+  ],
+  [
+    0b1111110,
+    0b1111000,
+    0b1100100,
+    0b0010100,
+    0b1010100,
+    0b1010100,
+    0b1111110
+  ],
+  [
+    0b0010000,
+    0b0010000,
+    0b0010000,
+    0b0010000,
+    0b0111000,
+    0b0010000,
+    0b0000000
+  ],
+  [
+    0b0000000,
+    0b1111110,
+    0b1011100,
+    0b1101010,
+    0b1110110,
+    0b1101010,
+    0b1011100
+  ],
+  [
+    0b0000000,
+    0b0100100,
+    0b0111100,
+    0b0101000,
+    0b0111100,
+    0b1111110,
+    0b0100100
+  ],
+] as const
 
-  // constants will get inlined
-  let VIEWSIZE = 9
-  let TILESIZE = 5
-  let floor = 3
-  let potion = 5
-  let stairs = 6
-  let sword = 7
-  let playerSprite = 0
-  let monsterSprite = 1
-  let potionSprite = 2
-  let stairsSprite = 3
-  let swordSprite = 4
-  let exitSprite = 5
-  let monster2Sprite = 6
-  let swordAmount = 1
+// --- Constants ---
+const VIEWSIZE = 9
+const TILESIZE = 7
 
-  // global state
-  let level = 0
-  let mapData: any
-  let mobs: number[][]
+// Tiles
+const TILE_FLOOR = 3
+const TILE_POTION = 5
+const TILE_STAIRS = 6
+const TILE_SWORD = 7
 
-  let draw = () => {
-    // start draw
+// Sprites
+const SPRITE_PLAYER = 0
+const SPRITE_MONSTER = 1
+const SPRITE_POTION = 2
+const SPRITE_STAIRS = 3
+const SPRITE_SWORD = 4
+const SPRITE_EXIT = 5
+const SPRITE_MONSTER2 = 6
 
-    // clear the canvas
-    a.width = VIEWSIZE * 7 * TILESIZE
-    // draw the map tiles within the viewport
-    for ( let viewY = 0; viewY < VIEWSIZE; viewY++ ) {
-      for ( let viewX = 0; viewX < VIEWSIZE; viewX++ ) {
-        let spriteIndex = (
-          /*
-            note the weird mapData[ x + 'string' + y ] pattern here
+// Palette source for hex construction
+const PALETTE = 'fd9640'
 
-            first use of this pattern - basically we join the x and y together
-            with an arbitrary string and use it for a key into the mapData
-            object
+// Key codes
+const KEY_LEFT = 37
+const KEY_UP = 38
+const KEY_RIGHT = 39
+const KEY_DOWN = 40
 
-            by making mapData an object instead of an array we don't have to
-            worry about out of bounds and etc
+// DOM
 
-            we join the x and y together with the most common string from the
-            rest of the code to assist with packing
-          */
+const canvas = document.querySelector<HTMLCanvasElement>('#viewport')!
+const ctx = canvas.getContext('2d')!
 
-          // do we have a mob at this location and is it alive, if so use
-          // its sprite
-          mobs[
-            ( viewX - 4 + mobs[ 0 ][ 0 ] )
-            + 'fd9640' +
-            ( viewY - 4 + mobs[ 0 ][ 1 ] )
-          ]
-          &&
-          mobs[
-            ( viewX - 4 + mobs[ 0 ][ 0 ] )
-            + 'fd9640' +
-            ( viewY - 4 + mobs[ 0 ][ 1 ] )
-          ][ 2 ] ?
-          mobs[
-            ( viewX - 4 + mobs[ 0 ][ 0 ] )
-            + 'fd9640' +
-            ( viewY - 4 + mobs[ 0 ][ 1 ] )
-          ][ 3 ] :
+// --- Global state ---
+let level = 0
+let swordAmount = 1 // 1..5, affects damage and player sword rendering
 
-          // or potion on map?
-          mapData[
-              ( viewX - 4 + mobs[ 0 ][ 0 ] )
-              + 'fd9640' +
-              ( viewY - 4 + mobs[ 0 ][ 1 ] )
-          ] == potion ?
-          potionSprite :
+// Sparse map where missing => wall; present => floor/potion/sword/stairs
+let mapData: Record<PointSlug, number> = {}
 
-          // or sword on map?
-          mapData[
-              ( viewX - 4 + mobs[ 0 ][ 0 ] )
-              + 'fd9640' +
-              ( viewY - 4 + mobs[ 0 ][ 1 ] )
-          ] == sword ?
-          swordSprite :
+// Entities + position index for O(1) lookup by tile
+let mobs: Entity[] = []
+let mobIndex: Record<PointSlug, number> = {}
 
-          // or stairs
-          mapData[
-              ( viewX - 4 + mobs[ 0 ][ 0 ] )
-              + 'fd9640' +
-              ( viewY - 4 + mobs[ 0 ][ 1 ] )
-          ] == stairs ?
-          // on the last level show exit sprite instead of stairs
-          level < 5 ? stairsSprite : exitSprite :
+// --- Small helpers ---
+const pointSlug = (x: number, y: number): PointSlug => `${x},${y}`
 
-          // nothing, use the guard value
-          7
-        )
+const getMobIndexAt = (x: number, y: number): number => {
+  const idx = mobIndex[pointSlug(x, y)]
 
-        c.fillStyle = (
-          // mob (monster or player) here and it's alive?
-          mobs[
-            ( viewX - 4 + mobs[ 0 ][ 0 ] )
-            + 'fd9640' +
-            ( viewY - 4 + mobs[ 0 ][ 1 ] )
-          ]
-          &&
-          mobs[
-            ( viewX - 4 + mobs[ 0 ][ 0 ] )
-            + 'fd9640' +
-            ( viewY - 4 + mobs[ 0 ][ 1 ] )
-          ][ 2 ] ?
-          /*
-            this charming piece of code makes the mob's color shift towards
-            red when its health is low
-          */
-          '#' + 'fd9640'[
-            mobs[
-              ( viewX - 4 + mobs[ 0 ][ 0 ] )
-              + 'fd9640' +
-              ( viewY - 4 + mobs[ 0 ][ 1 ] )
-            ][ 2 ]
-          ] + 37 :
+  return typeof idx === 'number' ? idx : -1
+}
 
-          // otherwise, is there a sprite, any sprite?
-          mapData[
-            ( viewX - 4 + mobs[ 0 ][ 0 ] )
-            + 'fd9640' +
-            ( viewY - 4 + mobs[ 0 ][ 1 ] )
-          ] ?
-          '#' + 964 :
+const indexMob = (idx: number) => {
+  const m = mobs[idx]
 
-          // must be a wall, use different colored walls for each level
-          '#' + 37 + 'fd9640'[ level ]
-        )
+  mobIndex[pointSlug(m.x, m.y)] = idx
+}
 
-        // iterate over the pixels for the current sprite
-        for ( let spriteY = 0; spriteY < 7; spriteY++ ) {
-          for ( let spriteX = 0; spriteX < 7; spriteX++ ) {
-            if (
-              (
-                /*
-                  if it's the player, draw a sword in the last row. as the
-                  player picks up more sword upgrades, the sword gets bigger
-                */
-                spriteIndex == playerSprite
-                &&
-                spriteX == 6
-                &&
-                spriteY < 6
-                &&
-                spriteY > 4 - swordAmount
-              )
-              ||
-              (
-                // if there's a sprite, true if the bit is set at this pixel
-                spriteIndex < 7
-                &&
-                !(
-                  (
-                    sprites.charCodeAt( spriteIndex * 7 + spriteY )
-                  ) >> spriteX & 1
-                )
-              )
-              ||
-              // there's no map data, it will draw a wall
-              !mapData[
-                  ( viewX - 4 + mobs[ 0 ][ 0 ] )
-                  + 'fd9640' +
-                ( viewY - 4 + mobs[ 0 ][ 1 ] )
-              ]
-            ) {
-              c.fillRect(
-                spriteX * TILESIZE + viewX * 7 * TILESIZE,
-                spriteY * TILESIZE + viewY * 7 * TILESIZE,
-                TILESIZE, TILESIZE
-              )
-            }
-          }
-        }
-      }
-    }
+const removeMobIndex = (x: number, y: number) => {
+  delete mobIndex[pointSlug(x, y)]
+}
 
-    // end draw
-  }
+const moveMob = (idx: number, nx: number, ny: number) => {
+  const m = mobs[idx]
 
-  // generate a new random map
-  let createMap = ( health: number ) => {
-    // initalise the tile currently being randomly added, first is always 0,0
-    let current = [ 0, 0 ]
-    // base size of the map
-    let size = 96
+  removeMobIndex(m.x, m.y)
 
-    // reset state
-    mapData = {}
-    /*
-      add the player as the first mob
-      if we went down a level restore the player's health to what it was
-    */
-    mobs = [ [ 0, 0, health, 0 ] ]
-    /*
-      mobs is an array AND an object, that way we can iterate over it but
-      also get a mob at a specific position without having to iterate over it
-    */
-    mobs[
-        ( 0 )
-        + 'fd9640' +
-        ( 0 )
-    ] = mobs[ 0 ]
+  m.x = nx
+  m.y = ny
 
-    // randomly add tiles to the map, as the level gets higher make it bigger
-    for ( let i = 0; i < ( size * ( level + 1 ) ); i++ ){
-      // by default it will be a floor tile
-      mapData[
-          ( current[ 0 ] )
-          + 'fd9640' +
-          ( current[ 1 ] )
-      ] = floor
+  indexMob(idx)
+}
 
-      // but some chance of it being a potion
-      if (
-        current[ 0 ] !== mobs[ 0 ][ 0 ] &&
-        !~~( Math.random() * ( size * ( level + 1 ) ) / ( level + 7 ) )
-      ) {
-        mapData[
-            ( current[ 0 ] )
-            + 'fd9640' +
-            ( current[ 1 ] )
-        ] = potion
-      }
-      // or a monster
-      else if (
-        current[ 0 ] !== mobs[ 0 ][ 0 ]
-        &&
-        !~~( Math.random() * ( size * ( level + 1 ) ) / ( level + 7 ) )
-        &&
-        !mobs[
-            ( current[ 0 ] )
-            + 'fd9640' +
-            ( current[ 1 ] )
-        ]
-      ) {
-        /*
-          create a new monster, place it at the end of the mobs array, then
-          also add it to the array as a property so we can look up mobs by
-          position without iterating
-        */
-        mobs[
-            ( current[ 0 ] )
-            + 'fd9640' +
-            ( current[ 1 ] )
-        ] = mobs[ mobs.length ] = [
-          current[ 0 ],
-          current[ 1 ],
-          ~~( Math.random() * 5 ) + 1,
-          ~~( Math.random() * 2 ) ? monsterSprite : monster2Sprite
-        ]
+const deltaFromKey = (code: number): { dx: number; dy: number } => ({
+  dx: code === KEY_LEFT ? -1 : code === KEY_RIGHT ? 1 : 0,
+  dy: code === KEY_UP ? -1 : code === KEY_DOWN ? 1 : 0,
+})
+
+const randInt = (exclMax: number) => Math.floor(Math.random() * exclMax)
+
+// --- Rendering ---
+const draw = () => {
+  canvas.width = canvas.height = VIEWSIZE * TILESIZE // clears canvas
+
+  const player = mobs[0]
+
+  for (let viewY = 0; viewY < VIEWSIZE; viewY++) {
+    for (let viewX = 0; viewX < VIEWSIZE; viewX++) {
+      const wx = viewX - 4 + player.x
+      const wy = viewY - 4 + player.y
+      const k = pointSlug(wx, wy)
+
+      const mobIdx = getMobIndexAt(wx, wy)
+      const mobHere = mobIdx >= 0 ? mobs[mobIdx] : undefined
+
+      // Determine sprite index to render (clear, non-nested)
+      let spriteIndex = 7 // guard => wall fill
+      if (mobHere && mobHere.hp > 0) {
+        spriteIndex = mobHere.sprite
+      } else if (mapData[k] === TILE_POTION) {
+        spriteIndex = SPRITE_POTION
+      } else if (mapData[k] === TILE_SWORD) {
+        spriteIndex = SPRITE_SWORD
+      } else if (mapData[k] === TILE_STAIRS) {
+        spriteIndex = level < 5 ? SPRITE_STAIRS : SPRITE_EXIT
       }
 
-      // now pick a random direction to add to the map next
-      let dir = ~~( Math.random() * 4 )
+      // Determine cell color
+      ctx.fillStyle = mobHere && mobHere.hp > 0
+        ? '#' + PALETTE[mobHere.hp] + 37
+        : mapData[k]
+          ? '#964'
+          : '#' + 37 + PALETTE[level]
 
-      /*
-        when the player wins we don't generate anything, so the level generated
-        after triggering the exit is empty, it causes a graphical glitch
-        which makes a nice win screen
-      */
-      if( level < 6 ){
-        // make the current tile the tile in the new direction
-        current = [
-          current[ 0 ] + [ 0, -1, 1, 0 ][ dir ],
-          current[ 1 ] + [ -1, 0, 0, 1 ][ dir ]
-        ]
-      }
-    }
-
-    // make the last tile visited the stairs to the next level
-    mapData[
-        ( current[ 0 ] )
-        + 'fd9640' +
-        ( current[ 1 ] )
-    ] = stairs
-  }
-
-  // key handler, triggers the game loop
-  b.onkeydown = e => {
-    // iterate over all mobs including player
-    for ( let i = 0; i < mobs.length; i++ ) {
-      // a random action for monsters to take
-      let action = ~~( Math.random() * 4 )
-      // will hold a code to determine movement
-      let which: number
-
-      /*
-        which will get overridden if it's the player, but if it's a monster:
-      */
-      // move in a random direction 50% of the time
-      if ( action < 2 ) {
-        which = ~~( Math.random() * 4 ) + 37
-      }
-      // try to move towards the player on the x axis
-      else if ( action < 3 ) {
-        which = mobs[ 0 ][ 0 ] < mobs[ i ][ 0 ] ? 37 : 39
-      }
-      // try to move towards the player on the y axis
-      else {
-        which = mobs[ 0 ][ 1 ] < mobs[ i ][ 1 ] ? 38 : 40
-      }
-
-      // only process mobs which are alive - health is stored in mobs[][2]
-      if( mobs[ i ][ 2 ] ){
-        // if i is 0 it's the player, use the keycode from the event
-        which = i ? which : e.which
-
-        // left and right modifier
-        let x = which == 37 ? -1 : which == 39 ? 1 : 0
-        // up and down modifier
-        let y = which == 38 ? -1 : which == 40 ? 1 : 0
-
-        if (
-          // dest is floor
-          (
-            mapData[
-            ( mobs[ i ][ 0 ] + x )
-            + 'fd9640' +
-            ( mobs[ i ][ 1 ] + y )
-            ] == floor
+      // Draw 7x7 tile
+      for (let sy = 0; sy < TILESIZE; sy++) {
+        for (let sx = 0; sx < TILESIZE; sx++) {
+          const isPlayerSword = (
+            spriteIndex === SPRITE_PLAYER &&
+            sx === 6 &&
+            sy < 6 &&
+            sy > 4 - swordAmount
           )
-          &&
-          // no other mob here
-          !mobs[
-            ( mobs[ i ][ 0 ] + x )
-            + 'fd9640' +
-            ( mobs[ i ][ 1 ] + y )
-          ]
-        ) {
-          // delete the mob from the array properties at the old location
-          mobs[
-            ( mobs[ i ][ 0 ] )
-            + 'fd9640' +
-            ( mobs[ i ][ 1 ] )
-          ] = 0
 
-          // update the mobs position to the new location
-          mobs[ i ][ 0 ] = mobs[ i ][ 0 ] + x
-          mobs[ i ][ 1 ] = mobs[ i ][ 1 ] + y
+          const isSpritePixel = (
+            spriteIndex < 7 &&
+            ((SPRITES[spriteIndex][sy] >> (6 - sx)) & 1) === 1
+          )
 
-          // re-add the mob as a property of the array at the new location
-          mobs[
-            ( mobs[ i ][ 0 ] )
-            + 'fd9640' +
-            ( mobs[ i ][ 1 ] )
-          ] = mobs[ i ]
-        }
-        else if (
-          // dest is another mob
-          mobs[
-          ( mobs[ i ][ 0 ] + x )
-          + 'fd9640' +
-          ( mobs[ i ][ 1 ] + y )
-          ]
-        ) {
-          // monster attacks player
-          if (
-            // current mob is not player
-            i
-            &&
-            // target is player
-            !mobs[
-            ( mobs[ i ][ 0 ] + x )
-            + 'fd9640' +
-            ( mobs[ i ][ 1 ] + y )
-            ][ 3 ]
-            &&
-            // 50% chance to hit
-            ~~( Math.random() * 2 )
-          ) {
-            // decrement player health
-            mobs[
-              ( mobs[ i ][ 0 ] + x )
-              + 'fd9640' +
-              ( mobs[ i ][ 1 ] + y )
-            ][ 2 ]--
+          const isWall = !mapData[k]
 
-            // if player dead, restart
-            if (
-              !mobs[
-              ( mobs[ i ][ 0 ] + x )
-              + 'fd9640' +
-              ( mobs[ i ][ 1 ] + y )
-              ][ 2 ]
-            ) {
-              // reset some of the state
-              level = 0
-              swordAmount = 1
-              createMap( 5 )
-            }
+          if (isPlayerSword || isSpritePixel || isWall) {
+            ctx.fillRect(
+              sx + viewX * TILESIZE,
+              sy + viewY * TILESIZE,
+              1,
+              1,
+            )
           }
-          // player attacks mob
-          else if (
-            // current mob is player
-            !i
-            &&
-            // there is a mob here
-            mobs[
-            ( mobs[ i ][ 0 ] + x )
-            + 'fd9640' +
-            ( mobs[ i ][ 1 ] + y )
-            ]
-            &&
-            // mob is not already dead
-            mobs[
-            ( mobs[ i ][ 0 ] + x )
-            + 'fd9640' +
-            ( mobs[ i ][ 1 ] + y )
-            ][ 2 ]
-          ) {
-            if (
-              // monster is still alive
-              mobs[
-              ( mobs[ i ][ 0 ] + x )
-              + 'fd9640' +
-              ( mobs[ i ][ 1 ] + y )
-              ][ 2 ]
-            ) {
-              //decrement monster health
-              mobs[
-                ( mobs[ i ][ 0 ] + x )
-                + 'fd9640' +
-                ( mobs[ i ][ 1 ] + y )
-              ][ 2 ]
-              =
-              mobs[
-                ( mobs[ i ][ 0 ] + x )
-                + 'fd9640' +
-                ( mobs[ i ][ 1 ] + y )
-              ][ 2 ] - ( ~~( Math.random() * swordAmount ) + 1 )
-            }
-
-            if (
-              // health is 0 or less
-              mobs[
-                ( mobs[ i ][ 0 ] + x )
-                + 'fd9640' +
-                ( mobs[ i ][ 1 ] + y )
-              ][ 2 ] <= 0
-            ) {
-              /*
-                set health to zero in case it was negative so we can test it for
-                falsiness, negatives are truthy
-              */
-              mobs[
-                ( mobs[ i ][ 0 ] + x )
-                + 'fd9640' +
-                ( mobs[ i ][ 1 ] + y )
-              ][ 2 ] = 0
-
-              // delete it from the array properties
-              mobs[
-                ( mobs[ i ][ 0 ] + x )
-                + 'fd9640' +
-                ( mobs[ i ][ 1 ] + y )
-              ] = 0
-
-              // maybe drop something
-              if (
-                !~~( Math.random() * 5 )
-              ) {
-                mapData[
-                  ( mobs[ i ][ 0 ] + x )
-                  + 'fd9640' +
-                  ( mobs[ i ][ 1 ] + y )
-                ] =
-                // drop a potion if sword is full
-                swordAmount < 5 ? sword : potion
-              }
-            }
-          }
-        }
-        // dest is potion, take
-        else if (
-          // current mob is player
-          !i
-          &&
-          // is potion
-          mapData[
-            ( mobs[ i ][ 0 ] + x )
-            + 'fd9640' +
-            ( mobs[ i ][ 1 ] + y )
-          ] == potion
-        ) {
-          // remove the potion
-          mapData[
-            ( mobs[ i ][ 0 ] + x )
-            + 'fd9640' +
-            ( mobs[ i ][ 1 ] + y )
-          ] = floor
-
-          // if player health not already max increment
-          if ( mobs[ i ][ 2 ] < 5 )
-            mobs[ i ][ 2 ]++
-        }
-        else if (
-          // current mob is player
-          !i
-          &&
-          // is sword
-          mapData[
-            ( mobs[ i ][ 0 ] + x )
-            + 'fd9640' +
-            ( mobs[ i ][ 1 ] + y )
-          ] == sword
-        ) {
-          // remove the sword from the map
-          mapData[
-            ( mobs[ i ][ 0 ] + x )
-            + 'fd9640' +
-            ( mobs[ i ][ 1 ] + y )
-          ] = floor
-
-          // if sword amount not max increment
-          if ( swordAmount < 5 )
-            swordAmount++
-        }
-        // dest is stairs, go down
-        else if (
-          // current mob is player
-          !i
-          &&
-          // is stairs
-          mapData[
-            ( mobs[ i ][ 0 ] + x )
-            + 'fd9640' +
-            ( mobs[ i ][ 1 ] + y )
-          ] == stairs
-        ) {
-          // generate a new level
-          level++
-          // have to pass player health through so it doesn't get lost
-          createMap( mobs[ i ][ 2 ] )
         }
       }
     }
+  }
+}
 
-    draw()
+// --- Map generation ---
+const createMap = (playerHealth: number) => {
+  const baseSize = 96
+  let cx = 0
+  let cy = 0
+
+  // Reset state
+  mapData = {}
+  mobs = [{ x: 0, y: 0, hp: playerHealth, sprite: SPRITE_PLAYER }]
+  mobIndex = {}
+  indexMob(0)
+
+  const steps = baseSize * (level + 1)
+
+  for (let i = 0; i < steps; i++) {
+    // carve floor
+    mapData[pointSlug(cx, cy)] = TILE_FLOOR
+
+    // maybe potion (avoid starting tile)
+    if (cx !== mobs[0].x && !randInt(Math.floor(steps / (level + 7)) || 1)) {
+      mapData[pointSlug(cx, cy)] = TILE_POTION
+    }
+    // maybe monster
+    else if (
+      cx !== mobs[0].x &&
+      !randInt(Math.floor(steps / (level + 7)) || 1) &&
+      getMobIndexAt(cx, cy) < 0
+    ) {
+      const idx = mobs.length
+
+      mobs.push({
+        x: cx,
+        y: cy,
+        hp: randInt(5) + 1,
+        sprite: randInt(2) ? SPRITE_MONSTER : SPRITE_MONSTER2,
+      })
+
+      indexMob(idx)
+    }
+
+    // random walk (skip on win+1 level for glitchy win screen)
+    if (level < 6) {
+      const dir = randInt(4)
+
+      cx += [0, -1, 1, 0][dir]
+      cy += [-1, 0, 0, 1][dir]
+    }
   }
 
-  // first run, set the player's initial health and draw
-  createMap( 5 )
+  // last carved becomes stairs
+  mapData[pointSlug(cx, cy)] = TILE_STAIRS
+}
+
+// --- Turn handling ---
+const processTurn = (keyCode: number) => {
+  for (let i = 0; i < mobs.length; i++) {
+    // choose action for monsters
+    let which: number
+    if (i === 0) {
+      which = keyCode
+    } else {
+      const action = randInt(4)
+      if (action < 2) {
+        which = KEY_LEFT + randInt(4) // 37..40
+      } else if (action < 3) {
+        which = mobs[0].x < mobs[i].x ? KEY_LEFT : KEY_RIGHT
+      } else {
+        which = mobs[0].y < mobs[i].y ? KEY_UP : KEY_DOWN
+      }
+    }
+
+    const m = mobs[i]
+
+    if (m.hp <= 0) continue
+
+    const { dx, dy } = deltaFromKey(which)
+
+    if (dx === 0 && dy === 0) continue
+
+    const nx = m.x + dx
+    const ny = m.y + dy
+    const nk = pointSlug(nx, ny)
+
+    // move to empty floor
+    if (mapData[nk] === TILE_FLOOR && getMobIndexAt(nx, ny) < 0) {
+      moveMob(i, nx, ny)
+
+      continue
+    }
+
+    const targetIdx = getMobIndexAt(nx, ny)
+
+    if (targetIdx >= 0) {
+      // Monster attacks player
+      if (i !== 0 && mobs[targetIdx].sprite === SPRITE_PLAYER && randInt(2)) {
+        const p = mobs[targetIdx]
+
+        p.hp--
+
+        if (p.hp <= 0) {
+          level = 0
+          swordAmount = 1
+
+          createMap(5)
+        }
+
+        continue
+      }
+
+      // Player attacks monster
+      if (i === 0) {
+        const t = mobs[targetIdx]
+
+        if (t.hp > 0) {
+          t.hp = t.hp - (randInt(swordAmount) + 1)
+        }
+
+        if (t.hp <= 0) {
+          t.hp = 0
+
+          removeMobIndex(t.x, t.y)
+
+          if (!randInt(5)) {
+            mapData[nk] = swordAmount < 5 ? TILE_SWORD : TILE_POTION
+          }
+        }
+        continue
+      }
+    }
+
+    // Player-only interactions
+    if (i === 0) {
+      // Potion
+      if (mapData[nk] === TILE_POTION) {
+        mapData[nk] = TILE_FLOOR
+
+        if (m.hp < 5) m.hp++
+
+        continue
+      }
+      // Sword
+      if (mapData[nk] === TILE_SWORD) {
+        mapData[nk] = TILE_FLOOR
+
+        if (swordAmount < 5) swordAmount++
+
+        continue
+      }
+      // Stairs
+      if (mapData[nk] === TILE_STAIRS) {
+        level++
+
+        createMap(m.hp)
+
+        continue
+      }
+    }
+  }
+
   draw()
-})()
+}
+
+// --- Init ---
+createMap(5)
+draw()
+
+// key handler (modern)
+document.body.onkeydown = (e: KeyboardEvent) => {
+  // Prefer e.key; fallback to no-op if non-arrow
+
+  let which = 0
+
+  switch (e.key) {
+    case 'ArrowLeft':
+      which = KEY_LEFT
+      break
+    case 'ArrowRight':
+      which = KEY_RIGHT
+      break
+    case 'ArrowUp':
+      which = KEY_UP
+      break
+    case 'ArrowDown':
+      which = KEY_DOWN
+      break
+  }
+
+  if (which) processTurn(which)
+}
